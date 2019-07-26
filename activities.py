@@ -470,7 +470,7 @@ class MainActivities(Activities):
         self.self_love()
         self.ten_ideas()
 
-        tasklist('Priorities', headings=['Personal', 'Work'])
+        tasklist('Priorities', priorities, 'Daily Priorities', headings=['Personal', 'Work'])
 
     def end_of_day_reflection(self):
 
