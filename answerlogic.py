@@ -209,7 +209,7 @@ def activity(activity_name, questions, frequency=None, ordered=False, cap=None, 
 		questions = add_frequency(questions, frequency)
 
 		# Add the frequency to the activities name
-		activity_name = f'{frequency} {activity_name}'
+		activity_name = f'{activity_name} ({frequency})'
 
 	# Walk through questions and collect answer data
 	activity_data = answer(questions, answer_type='listed', ordered=ordered, cap=cap)
@@ -262,21 +262,6 @@ def add_frequency(questions, frequency):
 
 	return questions
 
-def question_format_check(questions):
-	'''Puts questions that are only a string into a single question, or if the data type is not
-	a list, stirng, or tuple, it raises an exception error.
-
-	:param questions: list or string of questions
-	:return : returns a string in a tuple or a list of questions'''
-
-	if type(questions) in (list, tuple, str):
-		if type(questions) is str:
-			question = tuple([questions])
-			return question
-		return questions
-	else:
-		raise Exception( ('"questions" argument must be a string, tuple, or a list.'))
-
 def display(filename, keep='text', directory='Data Storage'):
 	'''display(title, *list_to_display, ordered=False)
 
@@ -319,20 +304,6 @@ def export(filename, data, directory='Data Storage', **kwargs):
 
 	else:
 
-		# Time variables
-		now = datetime.now()
-		todays_date = f'{now.month}/{now.day}/{now.year}'
-		today = now.strftime('%A')
-		time = now.strftime("%I:%M %p").lstrip('0')
-
-		# Time Functionality
-		if kwargs.get('report'):
-			time_column_headers = ['Date', 'Day']
-			time_column_data = [todays_date, today]
-		if kwargs.get("time") == 'full':
-			time_column_headers.append('Time')
-			time_column_data.append(time)
-
 		# Remove file_type from filename
 		if filename[:-4] in {'.txt', '.csv'}:
 			filename = filename[:-4]
@@ -343,7 +314,7 @@ def export(filename, data, directory='Data Storage', **kwargs):
 		# Determine the type of file.
 		data_type = type(data)
 		if data_type == list or data_type == str:
-			if data == str:
+			if data_type == str:
 				data = tuple([data])
 			if kwargs.get('report'):
 				filetype = 'csv'
@@ -355,8 +326,9 @@ def export(filename, data, directory='Data Storage', **kwargs):
 
 		# Create a text file that stores the data in a list format.
 		if filetype in {'txt', 'csv'}:
+
 			# If a file doesn't exist, write it.
-			if not os.path.isfile(f'.\\{directory}\\{filename}.{filetype}') or kwargs.get('overwrite'):
+			if not os.path.isfile(f'.\\{directory}\\{filename}.{filetype}') or kwargs.get('overwrite'):  # If overwrite=True, overwrite the a file.
 				if filetype is 'csv':
 					file = open(f'.\\{directory}\\{filename}.{filetype}', 'w', newline='')
 				elif filetype is 'txt':
@@ -370,16 +342,34 @@ def export(filename, data, directory='Data Storage', **kwargs):
 				elif filetype is 'txt':
 					file = open(f'.\\{directory}\\{filename}.{filetype}', 'a+')
 
+			# Create time variables csv and 'date' reports
+			now = datetime.now()
+			todays_date = f'{now.month}/{now.day}/{now.year}'
+			today = now.strftime('%A')
+			time = now.strftime("%I:%M %p").lstrip('0')
+
 			# Write report/csv
 			if filetype is 'csv':
+
+				# Define csv writer
 				writer = csv.writer(file)
+
+				# Add time tracking columns to csv reports.
+				if kwargs.get('report'):
+					time_column_headers = ['Date', 'Day']
+					time_column_data = [todays_date, today]
+				if kwargs.get("time") == 'full':
+					time_column_headers.append('Time')
+					time_column_data.append(time)
 
 				# If file is in write mode, add a header row
 				if file.mode == 'w':
 					writer.writerow(time_column_headers + kwargs.get('report'))
+
 				# If the data inside of the data is a list, join each list of answers into a single answer and put it into a list
 				if type(data[0]) is list:
 					writer.writerow(time_column_data + [', '.join(answer) for answer in data])
+
 				# Otherwise, join the data and add it to the report.
 				else:
 					if len(', '.join(data)) is len(kwargs.get('report')):
@@ -417,8 +407,8 @@ def export(filename, data, directory='Data Storage', **kwargs):
 					# Write date if date is not in file text
 					if kwargs.get('date'):
 						file.seek(0)
-						filetext = file.read()
 						try:
+							filetext = file.read()
 							date_match = re.compile(todays_date).search(filetext).group()
 						except:
 							date_match = None
@@ -435,6 +425,26 @@ def export(filename, data, directory='Data Storage', **kwargs):
 							index += 1
 					print('List wrote...\n')
 				file.close()
+
+def integrity(yorn_questions_list, yorn_answers, dependency=None):
+	'''Takes in a list of yes or no answers and their resopnses and converts them to a total percentage value
+    based on a y to n ratio.'''
+
+	# Integrity starts at 100%
+	integrity = 100
+
+	# Each piece of the integrity is made up of the maximum integrity divided by the number of yes or no questions
+	piece = 100 / len(yorn_questions_list)
+
+	# Subtract a piece from the maximum integrity for each "no" answer
+	for answer in yorn_answers:
+		if answer == 'n' or answer == 'no':
+			integrity -= piece
+
+	# Put the integrity in an integer format for better readability (no messy decimals)
+	integrity = f'{int(integrity)}%'
+
+	return integrity
 
 def list_reflector(filename, topic, question, directory='Data Storage', **kwargs):
 	'''full_answer(filename, topic, questions, **kwargs)
@@ -519,6 +529,21 @@ def pick_option(question, acceptable_answers):
 				break
 
 	return choice
+
+def question_format_check(questions):
+	'''Puts questions that are only a string into a single question, or if the data type is not
+	a list, stirng, or tuple, it raises an exception error.
+
+	:param questions: list or string of questions
+	:return : returns a string in a tuple or a list of questions'''
+
+	if type(questions) in (list, tuple, str):
+		if type(questions) is str:
+			question = tuple([questions])
+			return question
+		return questions
+	else:
+		raise Exception( ('"questions" argument must be a string, tuple, or a list.'))
 
 def smart_choice(menu_items):
 	'''
