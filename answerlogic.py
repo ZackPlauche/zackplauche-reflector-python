@@ -296,7 +296,8 @@ def display(filename, keep='text', directory='Data Storage'):
 def export(filename, data, directory='Data Storage', **kwargs):
 	'''Exports data into a file for storage.
 
-	:param report: add a list of column names for your report.'''
+	:param report: add a list of column names for your report.
+	:param overwrite: write over a file that already exists **Warning: this will erase any data previously a file there.**'''
 
 	# Skip the whole function if data = None
 	if not data or not data[0]:
@@ -321,34 +322,35 @@ def export(filename, data, directory='Data Storage', **kwargs):
 			else:
 				data = tuple(data)
 				filetype = 'txt'
-		if data_type == pd.DataFrame:
+		elif data_type == pd.DataFrame:
 			filetype = 'xlsx'
 
-		# Create a text file that stores the data in a list format.
+		filepath = f'.\\{directory}\\{filename}.{filetype}'
+
+		# See if file is a txt or a csv, and if so perform the following actions.
 		if filetype in {'txt', 'csv'}:
 
-			# If a file doesn't exist, write it.
-			if not os.path.isfile(f'.\\{directory}\\{filename}.{filetype}') or kwargs.get('overwrite'):  # If overwrite=True, overwrite the a file.
+			# If a file doesn't exist, or is being overwritten, write it.
+			if not os.path.isfile(filepath) or kwargs.get('overwrite'):  # If overwrite=True, overwrite the a file.
 				if filetype is 'csv':
-					file = open(f'.\\{directory}\\{filename}.{filetype}', 'w', newline='')
+					file = open(filepath, 'w+', newline='')
 				elif filetype is 'txt':
-					file = open(f'.\\{directory}\\{filename}.{filetype}', 'w')
-					print(file.mode)
+					file = open(filepath, 'w+')
 
 			# If a file does exist, append to it.
 			else:
 				if filetype is 'csv':
-					file = open(f'.\\{directory}\\{filename}.{filetype}', 'a+', newline='')
+					file = open(filepath, 'a+', newline='')
 				elif filetype is 'txt':
-					file = open(f'.\\{directory}\\{filename}.{filetype}', 'a+')
+					file = open(filepath, 'a+')
 
-			# Create time variables csv and 'date' reports
+			# Create time variables for csv reports and text files that add dates to their entry.
 			now = datetime.now()
 			todays_date = f'{now.month}/{now.day}/{now.year}'
 			today = now.strftime('%A')
 			time = now.strftime("%I:%M %p").lstrip('0')
 
-			# Write report/csv
+			# Write report/csv if filetype is csv.
 			if filetype is 'csv':
 
 				# Define csv writer
@@ -366,7 +368,7 @@ def export(filename, data, directory='Data Storage', **kwargs):
 				if file.mode == 'w':
 					writer.writerow(time_column_headers + kwargs.get('report'))
 
-				# If the data inside of the data is a list, join each list of answers into a single answer and put it into a list
+				# If the data contains a nested list, join each list of answers into a single answer and put it into a list
 				if type(data[0]) is list:
 					writer.writerow(time_column_data + [', '.join(answer) for answer in data])
 
@@ -380,10 +382,9 @@ def export(filename, data, directory='Data Storage', **kwargs):
 			elif filetype is 'txt':
 
 				# Write title of text file if file is in write mode.
-				if file.mode == 'w':
-					print("Adding title to .txt file...\n")
+				if file.mode == 'w+':
 					file.write(f'{filename}:\n\n')
-					print('File title added...\n')
+
 
 				try:
 					file.seek(0)
@@ -411,19 +412,18 @@ def export(filename, data, directory='Data Storage', **kwargs):
 							filetext = file.read()
 							date_match = re.compile(todays_date).search(filetext).group()
 						except:
+
 							date_match = None
 						if date_match == todays_date:
-							print('Date skipped')
+							print('Skipping Date...\n')
 						else:
-							print('Adding Date')
+							print('Adding Date...\n')
 							file.write(f'\n{todays_date}\n')
 
-					print('Writing list...\n')
 					for item in data:
 						if item is not '':
 							file.write(f'{index}. {item}\n')
 							index += 1
-					print('List wrote...\n')
 				file.close()
 
 def integrity(yorn_questions_list, yorn_answers, dependency=None):

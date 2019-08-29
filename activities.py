@@ -2,7 +2,7 @@
 # Reflector\activities.py
 
 # -*- coding in: utf-8 -*-
-from answerlogic import answer, display, export, pick_option, list_reflector, activity
+from answerlogic import *
 from evernoteautogui import tasklist
 import pandas as pd
 import time
@@ -10,6 +10,7 @@ import os
 
 class Activities():
 
+    # TODO: Save information somewhere somehow
     def acclaim_system(self):
         '''
         Walks through the acclaim System Created by Ryan Donaldson.
@@ -41,11 +42,11 @@ class Activities():
         ]
 
         self_actualization_questions = [
-            'List the 1 project that User is Most Excited to work on.',
-            'List what skills that the User is going to use from the self esteem list',
+            'List the 1 project that you\'re Most Excited to work on',
+            'List what skills that you\'re going to use from the self esteem list',
             'List the actions that can be done to secure the success of that project',
             'List the criteria that will guage the success of that project.',
-            'Express completion of this Board to Accountability Partners'
+            'Express completion of this board to your accountability partners'  #TODO: Make the program automatically share on Facebook/send to fb group
         ]
 
         acclaim_system_questions = [
@@ -56,11 +57,7 @@ class Activities():
             self_actualization_questions
         ]
 
-        hierarchy_counter = 0
-
-        maslows_hierarchy = ('physiology', 'security', 'love & belonging', 'self esteem', 'self actualization')
-
-        self.acclaim_system_status = {
+        acclaim_system_status = {
             'Physiology': None,
             'Security': None,
             'Love & Belonging': None,
@@ -68,34 +65,32 @@ class Activities():
             'Self-Actualization': None
         }
 
-        # Ask all yes or no questions (1st - 3rd section of the hierarchy)
-        for question_list in acclaim_system_questions[:3]:
-            print(f"{maslows_hierarchy[hierarchy_counter]}: \n".upper())
-            responses = answer(question_list, answer_type='oneoff', yorn=True)
-            if hierarchy_counter == 0:
-                physiology_status = responses['Answers'].tolist()
-                self.acclaim_system_status['Physiology'] = physiology_status
-            elif hierarchy_counter == 1:
-                security_status = responses['Answers'].tolist()
-                self.acclaim_system_status['Security'] = security_status
-            elif hierarchy_counter == 2:
-                love_and_belonging_status = responses['Answers'].tolist()
-                self.acclaim_system_status['Love & Belonging'] = love_and_belonging_status
-            hierarchy_counter += 1
+        # Run through each stage of the acclaim system showing what stage the user is in and asking the questions
+        for hierarchy_stage, stage_questions in zip(acclaim_system_status.keys(), acclaim_system_questions):
 
-        # Ask all list questions
-        for question_list in acclaim_system_questions[3:]:
-            print(f"{maslows_hierarchy[hierarchy_counter]}:\n".upper())
-            response = answer(question_list, answer_type='listed', ordered=True, cap=True, question_index=True)
-            if hierarchy_counter == 3:
-                self_esteem_status = response['Answers'].tolist()
-                self.acclaim_system_status['Self-Esteem'] = self_esteem_status
-            elif hierarchy_counter == 4:
-                self_actualization_status = response['Answers'].tolist()
-                self.acclaim_system_status['Self-Actualization'] = self_actualization_status
-            hierarchy_counter += 1
+            # Print what part of the hierarchy the user is answering in:
+            print(f'{hierarchy_stage.upper()}:\n')
 
-        return self.acclaim_system_status
+            if stage_questions in acclaim_system_questions[:3]:
+                # Ask questions for user to answer
+                status = answer(stage_questions, answer_type='oneoff', yorn=True)
+
+                # Populate hierarchy stage integrity
+                stage_integrity = integrity(stage_questions, status)
+
+                # Print the hierarchy stage's integrity in an easy to read format
+                print(f'\nYour {hierarchy_stage.lower()} is at {stage_integrity}!\n')
+
+            # Self-esteem questions
+            elif stage_questions is acclaim_system_questions[3]:
+                self_esteem = answer(stage_questions, answer_type='listed', ordered=True, cap='auto')
+
+            # Self-actualization questions
+            elif stage_questions is acclaim_system_questions[4]:
+                favorite_project = answer(stage_questions[0], answer_type='oneoff')
+                print()
+                action_lists = answer(stage_questions[1:4], answer_type='listed', ordered=True)
+                share = answer(stage_questions[4], answer_type='oneoff', yorn=True)
 
     def life_addition(self):
 
@@ -145,34 +140,6 @@ class Activities():
 
         return improvements
 
-    def priorities(self, frequency=None, write_checklist=False):
-
-        questions = [
-            f'What are your top 3 personal priorities (starting with the most important)?',
-            f'What are your top 3 professional priorities (starting with the most important)?'
-        ]
-
-        priorities = activity('Priorities', questions, frequency=frequency, ordered=True, cap='auto')
-
-        columns = ['ONE Thing', 'Priority #2', 'Priority #3']
-
-        export("Personal Priorities", priorities[0], report=columns)
-        export("Work Priorities", priorities[1], report=columns)
-
-        if write_checklist == True:
-            title = f'{frequency} Priorities'.title()
-            tasklist(title, priorities, title, headings=['Personal', 'Work'])
-
-        return priorities
-
-    def wins(self, frequency=None):
-
-        wins = activity('Wins', 'What are your wins?', frequency=frequency, export='Date')
-
-        print(f'\nTotal Wins: {len(wins)}\n')
-
-        return wins
-
     def dave_asprey(self):
 
         dave_asprey_questions = [
@@ -184,14 +151,13 @@ class Activities():
         answer(dave_asprey_questions[0], answer_type='listed', ordered=True)
         answer(dave_asprey_questions[1:])
 
-    def important_metrics(self):  # TODO: Complete this.
+    def easier_life(self):
 
-        metrics = [
-            'Times Olga came: ',
-            'Overall Happiness: ',
-        ]
+        easier_ideas = answer('Name an idea to make your life easier', answer_type='oneoff', loop=5)
 
-        pass
+        export('Easy Ideas', easier_ideas)
+
+        return easier_ideas
 
     def goals(self):
         '''Displays a previous list of goals, and either ads or sets new ones.'''
@@ -250,6 +216,14 @@ class Activities():
 
         return health_results
 
+    def improvements(self):
+
+        improvements = answer('What can you do to improve?', 'listed')
+
+        export('Improvements', improvements)
+
+        return improvements
+
     def lessons(self):
         '''Allows user to share what lessons they've learned this day.'''
 
@@ -268,6 +242,8 @@ class Activities():
     def meaningful_experience(self):
 
         meaningful_experience = answer('What was one meaningful experience you had today?')
+
+        print(meaningful_experience)
 
         export('Meaningful Experiences', meaningful_experience, date=True)
 
@@ -293,6 +269,14 @@ class Activities():
         # Linebreak
         print()
 
+    def perfect_day(self, frequency):
+
+        print('Forget everything you just typed. Now,...\n')
+
+        perfect_day = activity('Perfect Day','What does your perfect day look like?', frequency=frequency, ordered=True, export='date')
+
+        return perfect_day
+
     def physiology_check(self):
         '''Checks up on health stats for the day.'''
 
@@ -308,20 +292,13 @@ class Activities():
 
         physiology_stats = answer(physiology_questions, answer_type='oneoff', yorn=True)
 
-        health = 100
-        health_key = 100 / 7
+        physiology_score = integrity(physiology_questions, physiology_stats)
 
-        for stat in physiology_stats:
-            if stat == 'n':
-                health -= health_key
+        print(f'\nYour physiology is at {physiology_score}.\n')
 
-        health_score = f'{int(health)}%'
+        physiology_columns = ['Score', 'Well Rested', 'Hydrated', 'Well Fed', 'Movement', 'Temperature', 'Clean Environment', 'Full of Health' ]
 
-        print(f'\nYour physiology is at {health_score}.\n')
-
-        health_columns = ['Score', 'Well Rested', 'Hydrated', 'Well Fed', 'Movement', 'Temperature', 'Clean Environment', 'Full of Health' ]
-
-        export('Health Stats', [health_score] + physiology_stats, report=health_columns)
+        export('Health Stats', [physiology_score] + physiology_stats, report=physiology_columns)
 
 
         return physiology_stats
@@ -340,6 +317,26 @@ class Activities():
 
         # Answers each question in a listed answer format.
         answer(tony_robbins_power_questions, answer_type='listed', ordered=True, question_index=True)
+
+    def priorities(self, frequency=None, write_checklist=False):
+
+        questions = [
+            f'What are your top 3 personal priorities (starting with The ONE Thing)?',
+            f'What are your top 3 professional priorities (starting with The ONE Thing)?'
+        ]
+
+        priorities = activity('Priorities', questions, frequency=frequency, ordered=True, cap='auto')
+
+        columns = ['ONE Thing', 'Priority #2', 'Priority #3']
+
+        export("Personal Priorities", priorities[0], report=columns)
+        export("Work Priorities", priorities[1], report=columns)
+
+        if write_checklist == True:
+            title = f'{frequency} Priorities'.title()
+            tasklist(title, priorities, title, headings=['Personal', 'Work'])
+
+        return priorities
 
     def prismatic_system(self):
         '''Walks user through Ryan Donaldson's PRISMATIC Goal Setting System.'''
@@ -404,15 +401,9 @@ class Activities():
 
     def success_metrics(self):
 
-        success_questions = [
+        metrics = [
 
         ]
-
-    def tasks(self):
-
-        tasks = list_reflector('My Tasks.txt', 'tasks', 'What tasks do you have (if any) floating around in your mind?')
-
-        return tasks
 
     def ten_ideas(self, topic=None, frequency=None, write_checklist=False):
         ''' This function takes in 10 ideas you come up with to improve
@@ -442,17 +433,13 @@ class Activities():
 
         return ideas
 
-    def the_one_thing(self):
-        '''Asks the focus question from the book "The One Thing".'''
+    def wins(self, frequency=None):
 
-        one_thing_question = "What is the one project you can work on so that all of the others become either easier or unnecessary?\n"
+        wins = activity('Wins', 'What are your wins?', frequency=frequency, export='Date')
 
-        one_thing = input(one_thing_question)
+        print(f'\nTotal Wins: {len(wins)}\n')
 
-        export('The One Thing', one_thing, overwrite=True)
-
-        # Linebreak
-        print()
+        return wins
 
 
 class MainActivities(Activities):
@@ -468,6 +455,7 @@ class MainActivities(Activities):
         self.life_addition()
         priorities = self.priorities('daily')
         self.self_love()
+        self.easier_life()
         self.ten_ideas()
 
         tasklist('Priorities', priorities, 'Daily Priorities', headings=['Personal', 'Work'])
@@ -477,14 +465,15 @@ class MainActivities(Activities):
 
         print('Good evening sir ;) \n')
 
-        wins = self.wins()
-        lessons = self.lessons()
-        appreciation_list = self.gratitude()
-        meaningful_experience = self.meaningful_experience()
-        self_love = self.self_love()
-        improvements = self.ten_ideas()
-        goals = self.goals()
-        tasks = self.tasks()
+        self.wins()
+        self.improvements()
+        self.lessons()
+        self.gratitude()
+        self.meaningful_experience()
+        self.self_love()
+        self.easier_life()
+        self.ten_ideas()
+        self.goals()
 
     def weekly_reflection(self):
         print('I hope you had a nice week sir! :)\n')
@@ -493,11 +482,10 @@ class MainActivities(Activities):
         self.review('Ideas List.txt','ideas')
         priorities = self.priorities('weekly')
         ideas = self.ten_ideas('crush it this week.')
+        perfect_day = self.perfect_day('weekly')
 
         tasklist('Weekly Priorities', priorities, 'Weekly Priorities', headings=['Personal', 'Work'])
         tasklist('Weekly Ideas', ideas, 'Idea Lists')
-
-
 
     def birthday_reflection(self):
         '''Reflection to be done on your birthday.'''
@@ -512,12 +500,25 @@ class MainActivities(Activities):
         tasklist('Yearly Ideas', ideas, 'Idea Lists')
 
 
-activities = Activities()
+# class Goal():
+#
+#     def __init__(self, goal):
+#         self.goal = goal
+#         self.people
+#         self.resources
+#         self.identities
+#         self.specifics
+#         self.metrics
+#         self.actions
+#         self.timeline
+#         self.information
+#         self.criteria_for_success
 
+activities = Activities()
 main_activities = MainActivities()
 
 def main():
-    activities.physiology_check()
+    activities.goals()
 
 if __name__ == '__main__':
     main()
