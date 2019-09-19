@@ -401,7 +401,8 @@ class Activities():
 
     def success_metrics(self):
 
-        print("Success Metrics")
+        print('Please report your success metrics for the day: \n')
+
 
         metrics = [
             'Pushups Sets & Amount',
@@ -418,8 +419,9 @@ class Activities():
         ]
 
         success_metrics = answer(metrics, answer_type='oneoff')
+        print()
 
-        export('Success Metrics', success_metrics, report=metrics, time=full)
+        export('Success Metrics', success_metrics, report=metrics, time='full')
 
     def ten_ideas(self, topic=None, frequency=None, write_checklist=False):
         ''' This function takes in 10 ideas you come up with to improve
