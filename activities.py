@@ -401,9 +401,25 @@ class Activities():
 
     def success_metrics(self):
 
-        metrics = [
+        print("Success Metrics")
 
+        metrics = [
+            'Pushups Sets & Amount',
+            'Plank Sets & Time',
+            'Kegal Sets & Time',
+            'Wyzant Proposals Sent',
+            'Wyzant Responses Received',
+            'Wyzant Calls Scheduled',
+            'Wyzant Meetings Had',
+            'Wyzant Meetings Succeeded',
+            'Wyzant Lessons Submitted',
+            'Wyzant Reviews Recieved',
+            'Wyzant Payment Recieved',
         ]
+
+        success_metrics = answer(metrics, answer_type='oneoff')
+
+        export('Success Metrics', success_metrics, report=metrics, time=full)
 
     def ten_ideas(self, topic=None, frequency=None, write_checklist=False):
         ''' This function takes in 10 ideas you come up with to improve
@@ -465,6 +481,7 @@ class MainActivities(Activities):
 
         print('Good evening sir ;) \n')
 
+        self.success_metrics()
         self.wins()
         self.improvements()
         self.lessons()
@@ -479,7 +496,6 @@ class MainActivities(Activities):
         print('I hope you had a nice week sir! :)\n')
 
         self.wins('weekly')
-        self.review('Ideas List.txt','ideas')
         priorities = self.priorities('weekly')
         ideas = self.ten_ideas('crush it this week.')
         perfect_day = self.perfect_day('weekly')
