@@ -1,3 +1,5 @@
 Data Storage
 *.pyc
 *.idea
+Pipfile
+venv

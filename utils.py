@@ -245,20 +245,22 @@ def add_frequency(questions, frequency):
 	frequency = frequency.lower()
 
 	# arg_check on frequency
-	arg_check('frequency', ['daily', 'weekly', 'monthly', 'yearly'], frequency)
+	arg_check('frequency', ['daily', 'weekly', 'monthly', 'yearly', 'tomorrow'], frequency)
 
 	# Add a time to add to the questions
 	if frequency == 'daily':
-		time = 'day'
+		time = 'the day'
 	elif frequency == 'weekly':
-		time = 'week'
+		time = 'the week'
 	elif frequency == 'monthly':
-		time = 'month'
+		time = 'the month'
 	elif frequency == 'yearly':
-		time = 'year'
+		time = 'the year'
+	elif frequency == 'tomorrow':
+		time = 'tomorrow'
 
 	# Add time to each question
-	questions = [f'{question[:-1]} for the {time}?' for question in questions]
+	questions = [f'{question[:-1]} for {time}?' for question in questions]
 
 	return questions
 
@@ -365,7 +367,8 @@ def export(filename, data, directory='Data Storage', **kwargs):
 					time_column_data.append(time)
 
 				# If file is in write mode, add a header row
-				if file.mode == 'w':
+				print(file.mode)
+				if file.mode == 'w+':
 					writer.writerow(time_column_headers + kwargs.get('report'))
 
 				# If the data contains a nested list, join each list of answers into a single answer and put it into a list

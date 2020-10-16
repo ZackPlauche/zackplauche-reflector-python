@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+import time
+import os
+from activities import MainActivities
+from utils import smart_choice
+
 # Reflector/reflector.py
 
 '''Reflector is an app that allows it's user to walk through useful thought processes using high-quality questions from different success resources.
@@ -5,12 +12,6 @@
 "Everytime I use this app, it feels like coming home."
 
 '''
-
-# -*- coding: utf-8 -*-
-import time
-import os
-from activities import MainActivities
-from answerlogic import smart_choice
 
 
 class Reflector(MainActivities):
@@ -39,14 +40,20 @@ class Reflector(MainActivities):
             activity_list = [
                 'Morning Reflection',
                 'End of Day Reflection',
+                'Success Metrics',
                 'Weekly Reflection',
-                'Birthday Reflection',
+                'Monthly Reflection',
+                # 'Birthday Reflection',
                 'Acclaim System',
                 'Prismatic System',
-                '10 Ideas',
-                'Goals',
-                'Priorities',
+                # '10 Ideas',
+                # 'Goals',
+                # 'Priorities',
                 'Physiology Check',
+                'Off The Wagon',
+                'Operation SELF',
+                'Operation Red Dragon',
+
             ]
 
         choice = smart_choice(activity_list)
@@ -87,10 +94,21 @@ class Reflector(MainActivities):
             self.lessons()
         elif choice == 'Weekly Reflection':
             self.weekly_reflection()
+        elif choice == 'Monthly Reflection':
+            self.monthly_reflection()
+        elif choice == 'Success Metrics':
+            self.success_metrics()
+        elif choice == 'Off The Wagon':
+            self.off_the_wagon()
+        elif choice == 'Operation SELF':
+            self.operation_self()
+        elif choice == 'Operation Red Dragon':
+            self.operation_red_dragon()
+
 
         # End Timer
         total_time = round(time.time() - starttimer)
-        print(f'Your reflection took {total_time} seconds.')
+        print(f'Your reflection took {total_time // 60 } minutes.')
         os.system('pause')
 
 reflector = Reflector()
