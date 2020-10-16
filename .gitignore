@@ -1,5 +1,7 @@
 Data Storage
 *.pyc
 *.idea
+__pycache__
+openpyxl_training.py
 Pipfile
 venv
