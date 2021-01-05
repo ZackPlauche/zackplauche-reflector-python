@@ -5,13 +5,6 @@ import os
 from activities import MainActivities
 from utils import smart_choice
 
-# Reflector/reflector.py
-
-'''Reflector is an app that allows it's user to walk through useful thought processes using high-quality questions from different success resources.
-
-"Everytime I use this app, it feels like coming home."
-
-'''
 
 
 class Reflector(MainActivities):

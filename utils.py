@@ -196,7 +196,7 @@ def answer(questions, answer_type='text', output='list', **kwargs):
 	elif output == 'dict':
 		return answer_dict
 	elif output == 'dataframe':
-		return answers_datafarme
+		return answers_dataframe
 
 def activity(activity_name, questions, frequency=None, ordered=False, cap=None, **kwargs):
 	'''Shorter format for added funcionality for each reflector activity.'''
