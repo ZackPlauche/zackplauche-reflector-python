@@ -91,22 +91,6 @@ def answer_question_as_text(question):
     return answer
 
 
-def _validate_required_choice_answer(answer: str, choices: list):
-    valid_answers = map(str.casefold, choices)
-    help_text = _create_choice_help_text(choices)
-
-    if not answer:
-        raise ValueError(f'Answer must not be left blank. {help_text}.')
-
-    elif answer.casefold not in valid_answers:
-        raise ValueError(f'Invalid answer. {help_text} or left blank.')
-
-
-def _validate_required_answer(answer: str):
-    if not answer:
-        raise ValueError(f'Answer must not be left blank.')
-
-
 def answer_question(question, answer_type, **kwargs):
     if answer_type == 'oneoff':
         answer = answer_question_as_inline(question, kwargs.get('yesno'))
