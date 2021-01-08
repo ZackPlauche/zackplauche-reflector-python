@@ -1,3 +1,6 @@
+import re
+
+
 def _create_choice_help_text(choices: list):
     if len(choices) == 1:
         help_text = f'Available choice is {choices[0]}.'
