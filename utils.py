@@ -1,5 +1,3 @@
-# Reflector/reflector/answerlogic/answer_logic.py
-
 # -*- coding: utf-8 -*-
 import csv
 import os
@@ -9,336 +7,18 @@ from datetime import datetime
 from pathlib import Path
 
 
-def answer_as_ul(input_prefix='• '):
-    answer_list = []
-    while answer := input(input_prefix):
-        answer_list.append(answer)
-    return answer_list
-
-
-def answer_as_ol(input_prefix='. '):
-    answer_list = []
-    while answer := input({len(answer_list) + 1} + input_prefix):
-        answer_list.append(answer)
-    return answer_list
-
-
-def answer_as_capped_ul(cap, input_prefix='• '):
-    answer_list = []
-    for i in cap:
-        answer = input(f'{input_prefix}({i + 1} of {cap}):')
-        answer_list.append()
-    return answer_list
-
-
-def answer_as_capped_ol(cap, input_prefix='. '):
-    answer_list = []
-    for i in cap:
-        answer = input(f'{i + 1}{input_prefix}')
-        answer_list.append()
-    return answer_list
-
-
-def answer_question_as_ul(question, input_prefix='• '):
-    print(question)
-    answer_list = answer_as_ul(input_prefix)
-    return answer_list
-
-
-def answer_question_as_ol(question, input_prefix='. '):
-    print(question)
-    answer_list = answer_as_ol(input_prefix)
-    return answer_list
-
-
-def answer_question_as_capped_ul(question, cap, input_prefix='• '):
-    print(question)
-    answer_list = answer_as_capped_ul(cap, input_prefix)
-    return answer_list
-
-
-def answer_question_as_capped_ol(question, cap, input_prefix='. '):
-    print(question)
-    answer_list = answer_as_capped_ol(cap)
-    return answer_list
-
-
-def answer_question_as_oneoff(question):
-    answer = input(f'{question}: ')
-    return answer
-
-
-def validate_required_answer(answer: str):
-    if not answer:
-        raise ValueError(f'Answer must not be left blank.')
-
-
-def answer_question_as_oneoff_required(question):
-    answer = answer_question_as_oneoff(question)
-    validate_required_answer(answer)
-    return answer
-
-
-def create_choice_help_text(choices: list):
-    if len(choices) == 1:
-        help_text = f'Available choice is {choices[0]}.'
-    elif len(choices) == 2:
-        help_text = f'Available choices are either {choices[0]} or {choices[1]}.'
-    else:
-        help_text = f'Available choices are {", ".join(choices[:-1])} or {choices[-1]}'
-    return help_text
-
-
-def format_answer_and_choice_case(answer, choices):
-    formatted_answer = answer.casefold()
-    formatted_choices = map(str.casefold, choices)
-    return formatted_answer, formatted_choices
-
-
-def validate_choice_answer(answer: str, choices: list, required=False):
-    answer, valid_answers = format_answer_and_choice_case(answer, choices)
-    help_text = create_choice_help_text(choices)
-
-    if answer and answer not in valid_answers:
-        raise ValueError(f'Invalid answer. {help_text}')
-
-def validate_required_choice_answer(answer: str, choices: list):
-    answer, valid_answers = format_answer_and_choice_case(answer, choices)
-    help_text = create_choice_help_text(choices)
-
-    if not answer:
-        raise ValueError(f'Answer must not be left blank. {help_text}.')
-
-    elif answer not in valid_answers:
-        raise ValueError(f'Invalid answer. {help_text} or left blank.')
-
-
-def answer_question_as_choice(question, choices: list):
-    choice_suffix = f' ({", ".join(choices)})'
-    answer = answer_question_as_oneoff(f'{question}{choice_suffix}')
-    validate_choice_answer(answer, choices)
-
-def answer_question_as_choice_required(question, choices: list):
-    answer = answer_question_as_choice(question, choices, required=True)
-    validate_required_choice_answer(answer)
-    return answer
-
-
-def answer_as_yn(question, required=False):
-    answer = answer_question_as_choice(question, ['yes', 'y', 'no', 'n'], required)
-    return answer
-
-
-def validate_questions(questions):
-    if type(questions) not in (list, tuple, str):
-        raise TypeError('"questions" argument must be a string, tuple, or a list.')
-
-    if type(questions) is str:
-        question = tuple([questions])
-        return question
-    return questions
-
-
-def answer(questions, answer_type='text', output='list', **kwargs):
-    '''answer(questions, answer_type='text' output='list', **kwargs)
-
-    Creates a loop where user can answer however much text
-    they would like to.
-
-    :param *questions: Enter a question to give an answer to.
-    :param answer_type: Chooese whether you'd like text answers, listed answers, or yes or no answers
-    :param **kwargs: So far only lets you add indexes to your questions
-    :return: pandas dataframe providing full answer information
-
-    '''
-    # Accept question or questions
-    questions = validate_questions(questions)
-
-    # List of indexes for each question
-    question_indexes = list(range(1, len(questions) + 1))
-
-    # Initialize list of answers
-    answers = []
-
-    # Collect data for dataframe
-    answer_dict = {
-        'Question Index': question_indexes,
-        'Questions': questions,
-        'Answers': answers
-    }
-
-    # Ask each question in the given list of questions
-    for question in questions:
-
-        # Container to collect each questions answer
-        answer_collector = []
-
-        # Adds a question index if question_index=True
-        if kwargs.get('question_index'):
-            question_index = f'({questions.index(question) + 1} out of {len(questions)})'
-
-        # Makes all questions collect only a single response as the answer
-        if answer_type == 'oneoff':
-
-            # Ask the same one off question and build a list to return as the answer
-            if kwargs.get("loop"):
-
-                for i in range(1, kwargs.get("loop") + 1):
-                    if kwargs.get('question_index'):
-                        looped_oneoff_answer = input(
-
-                            f'{question} {question_index} ({i} of {kwargs.get("loop")}): ')
-                    else:
-                        looped_oneoff_answer = input(f'{question} ({i} of {kwargs.get("loop")}): ')
-
-                    answer_collector.append(looped_oneoff_answer)
-
-            # Make all oneoff questions yes or no questions if answer_type == 'yorn'
-            elif kwargs.get('yorn'):
-
-                # Ask yes or no question with question index if question_index=True
-                if kwargs.get('question_index'):
-                    answer = input(f'{question} {question_index} (y/n): ')
-
-                else:
-                    # Ask yes or no question normally
-                    answer = input(f"{question} (y/n): ")
-
-            # Ask oneoff question with a question_index
-            elif kwargs.get('question_index'):
-                answer = input(f'{question} {question_index}: ')
-
-            # Ask oneoff question normally
-            else:
-                answer = input(f'{question}: ')
-
-        else:
-
-            # Add an answer counter if answer_type='listed' and ordered=True
-            if answer_type == 'listed' and kwargs.get('ordered'):
-                answer_counter = 1
-
-            # Ask the question
-            if kwargs.get('question_index'):
-
-                # Ask the question displaying the index
-                print(f"{question} {question_index}")
-
-            else:
-                # Ask the question normally
-                print(f"{question}")
-
-            # Loop starts to continually to collect text_answers.
-            while True:
-
-                if answer_type == 'listed':
-
-                    if kwargs.get('ordered'):
-
-                        # Prints out the answer number and allows for input
-                        if kwargs.get('cap'):
-
-                            # Automatically find an answer cap within each question
-                            if kwargs.get('cap') == 'auto':
-                                pattern = "\d+"
-                                regex = re.compile(pattern)
-                                match = regex.search(question)
-                                if match:
-                                    answer_cap = int(match.group())
-                                else:
-                                    answer_cap = False
-
-                            # Manually add an answer cap
-                            if type(kwargs.get('cap')) == type(int()):
-                                answer_cap = kwargs.get('cap')
-
-                            # If answer cap was made
-                            if answer_cap:
-                                listed_answer = input(f'{answer_counter} of {answer_cap}. ')
-
-                            # When no answer_cap is found
-                            else:
-                                listed_answer = input(f'{answer_counter}. ')
-
-                        # When there is no answer cap
-                        else:
-                            listed_answer = input(f'{answer_counter}. ')
-                            answer_counter += 1
-
-                    else:
-                        listed_answer = input(f'• ')
-
-                    # Breaks out of the loop if no answer is given.
-                    if listed_answer == '':
-                        print()
-                        break
-
-                    answer_collector.append(listed_answer)
-
-                    # Break out of loop after the last answer is appended if answer_counter is equal to answer_cap
-                    if kwargs.get('cap'):
-                        if answer_counter:
-                            if answer_counter == answer_cap:
-                                print()
-                                break
-
-                            answer_counter += 1
-
-                elif answer_type == 'text':
-
-                    # Input the text
-                    text_answer = input('')
-
-                    # Exit the loop if text_answer was '.'
-                    if text_answer == '.':
-                        break
-
-                    # Adds Python formatting option.
-                    if kwargs.get('format') == 'python':
-                        # Add a line break after each answer.
-                        text_answer = f'{answer}\n'
-
-                    # Collect all of the text organized into a list
-                    answer_collector.append(text_answer)
-
-            # Make the list into a single formatted string of text after the answer loop breaks
-            if answer_type == 'listed':
-                answer = answer_collector
-
-            elif answer_type == 'text':
-                answer = ' '.join(answer_collector)
-
-        if answer_type == 'oneoff' and kwargs.get("loop"):
-            answer = answer_collector
-
-        # Add each answer to answers list
-        answers.append(answer)
-
-    # return kwargs
-    if output == 'list':
-        if len(questions) == 1:
-            return answer
-        else:
-            return answers
-    elif output == 'dict':
-        return answer_dict
-
-
-def activity(activity_name, questions, frequency=None, ordered=False, cap=None, **kwargs):
+def activity(activity_name, question_list, frequency=None, ordered=False, cap=None, **kwargs):
     '''Shorter format for added funcionality for each reflector activity.'''
-
-    # Check questions for formatting errors
-    questions = validate_questions(questions)
 
     # Add frequency if frequency is defined
     if frequency:
-        questions = add_frequency(questions, frequency)
+        question_list = add_frequency(question_list, frequency)
 
         # Add the frequency to the activities name
         activity_name = f'{activity_name} ({frequency})'
 
-    # Walk through questions and collect answer data
-    activity_data = answer(questions, answer_type='listed', ordered=ordered, cap=cap)
+    # Walk through question_list and collect answer data
+    activity_data = answer(question_list, answer_type='listed', ordered=ordered, cap=cap)
 
     # If kwarg "export" exists, export data as it should be exported.
     if kwargs.get('export'):
@@ -367,15 +47,13 @@ def arg_check(arg_name, response_list, arg):
             f'Arugument "{arg_name}" must equal {appropriate_response}. Please check your spelling and try again.')
 
 
-def add_frequency(questions, frequency):
-    '''Add frequency to a question or series of questions'''
+def add_frequency(question_list, frequency):
+    '''Add frequency to a question or series of question_list'''
     # Lowercase frequency to ensure proper string format is standard from the beginning
     frequency = frequency.lower()
-
-    # arg_check on frequency
     arg_check('frequency', ['daily', 'weekly', 'monthly', 'yearly', 'tomorrow'], frequency)
 
-    # Add a time to add to the questions
+    # Add a time to add to the question_list
     if frequency == 'daily':
         time = 'the day'
     elif frequency == 'weekly':
@@ -388,9 +66,9 @@ def add_frequency(questions, frequency):
         time = 'tomorrow'
 
     # Add time to each question
-    questions = [f'{question[:-1]} for {time}?' for question in questions]
+    question_list = [f'{question[:-1]} for {time}?' for question in question_list]
 
-    return questions
+    return question_list
 
 
 def display(filename, keep='text', directory='Data Storage'):
@@ -530,8 +208,8 @@ def export(filename, data, directory='Data Storage', **kwargs):
 
                 # Text report template
                 if kwargs.get('report'):
-                    questions = kwargs.get('report')
-                    for answer, question in zip(data, questions):
+                    question_list = kwargs.get('report')
+                    for answer, question in zip(data, question_list):
                         file.write(f'Question {kwargs.get("report").index(question) + 1}: {question}\n\nAnswer: {answer}')
 
                 # List Template
@@ -558,7 +236,7 @@ def export(filename, data, directory='Data Storage', **kwargs):
                 file.close()
 
 
-def integrity(yorn_questions_list, yorn_answers, dependency=None):
+def integrity(yorn_question_list_list, yorn_answers, dependency=None):
     '''
     Takes in a list of yes or no answers and their resopnses and converts them to a total percentage value
     based on a y to n ratio.
@@ -567,8 +245,8 @@ def integrity(yorn_questions_list, yorn_answers, dependency=None):
     # Integrity starts at 100%
     integrity = 100
 
-    # Each piece of the integrity is made up of the maximum integrity divided by the number of yes or no questions
-    piece = 100 / len(yorn_questions_list)
+    # Each piece of the integrity is made up of the maximum integrity divided by the number of yes or no question_list
+    piece = 100 / len(yorn_question_list_list)
 
     # Subtract a piece from the maximum integrity for each "no" answer
     for answer in yorn_answers:
@@ -582,7 +260,7 @@ def integrity(yorn_questions_list, yorn_answers, dependency=None):
 
 
 def list_reflector(filename, topic, question, directory='Data Storage', **kwargs):
-    '''full_answer(filename, topic, questions, **kwargs)
+    '''full_answer(filename, topic, question_list, **kwargs)
 
     :param filename:
     :param topic:
@@ -680,9 +358,7 @@ def smart_choice(menu_items):
 
     choice = input(f'\nActivity number {choice_range}: ')
     print()
-    if choice == '':
-        pass
-    else:
+    if choice != '':
         try:
             if int(choice) in range(len(menu_items) + 1):
                 pass
@@ -729,11 +405,11 @@ def smart_choice(menu_items):
 
 
 def test():
-    questions = [
+    question_list = [
         'What are your priorities?',
         'What are your wins?'
     ]
-    activity('test', questions, export_data=False, frequency='daily', ordered=True, cap=3)
+    activity('test', question_list, export_data=False, frequency='daily', ordered=True, cap=3)
 
 
 if __name__ == '__main__':
