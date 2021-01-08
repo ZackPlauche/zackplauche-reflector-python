@@ -1,7 +1,9 @@
 import re
 
+from utils import casefold_all
 
-def _create_choice_help_text(choices: list):
+
+def create_choice_help_text(choices: list):
     if len(choices) == 1:
         help_text = f'Available choice is {choices[0]}.'
     elif len(choices) == 2:
@@ -11,29 +13,31 @@ def _create_choice_help_text(choices: list):
     return help_text
 
 
-def _validate_choice_answer(answer: str, choices: list):
-    valid_answers = map(str.casefold, choices)
-    help_text = _create_choice_help_text(choices)
+def validate_answer_choice(answer: str, choices: list):
+    answer, choices = casefold_all(answer, choices)
+    error = 'Invalid answer.'
+    help_text = create_choice_help_text(choices)
+    error_message = f'{error} {help_text}'
 
-    if answer and answer not in valid_answers:
-        raise ValueError(f'Invalid answer. {help_text}')
+    if answer and answer.casefold() not in choices:
+        raise ValueError(error_message)
 
 
 def answer_question_as_inline(question, yesno=False):
     question = f'{question} (y/n)' if yesno else question
     answer = input(f'{question}: ')
     if yesno:
-        _validate_choice_answer(answer, ['yes', 'y', 'no', 'n'])
+        validate_answer_choice(answer, ['yes', 'y', 'no', 'n'])
     return answer
 
 
-def _validate_list_answer_cap(cap):
+def validate_list_answer_cap(cap):
     help_text = 'cap must be set to \'auto\' or an integer greater than or equal to 1.'
     if (type(cap) is int and cap < 1) or (type(cap) is str and cap != 'auto'):
         raise ValueError(help_text)
 
 
-def _get_cap_in_answer_prefix(answer_prefix):
+def get_cap_in_answer_prefix(answer_prefix):
     pattern = "\d+"  # TODO: Make Regex ignore inside of parenthesis "(...)"
     regex = re.compile(pattern)
     match = regex.search(answer_prefix)
@@ -41,13 +45,13 @@ def _get_cap_in_answer_prefix(answer_prefix):
     return answer_cap
 
 
-def _create_cap_suffix(iteration, cap):
+def create_cap_suffix(iteration, cap):
     cap_suffix = f'{iteration} in {cap}' if cap else None
     return cap_suffix
 
 
-def _create_list_answer_prefix(input_prefix, iteration, ordered, cap, input_suffix):
-    cap_suffix = _create_cap_suffix(iteration, cap)
+def create_list_answer_prefix(input_prefix, iteration, ordered, cap, input_suffix):
+    cap_suffix = create_cap_suffix(iteration, cap)
     if ordered:
         answer_prefix = f'{cap_suffix}. ' if cap else f'{iteration}. '
     elif cap:
@@ -59,17 +63,17 @@ def _create_list_answer_prefix(input_prefix, iteration, ordered, cap, input_suff
     return answer_prefix
 
 
-def _answer_as_list(input_prefix, ordered=False, cap=None, input_suffix=''):
+def answer_as_list(input_prefix, ordered=False, cap=None, input_suffix=''):
     answer_list = []
-    _validate_list_answer_cap(cap)
+    validate_list_answer_cap(cap)
     if cap == 'auto':
-        print('Auto')
-        cap = _get_cap_in_answer_prefix(input_prefix)
-        print(cap)
+        # print('Auto') # TODO: Make get_cap_in_answer_prefix ignroe inside of parenthesis "(...)"
+        cap = get_cap_in_answer_prefix(input_prefix)
+        # print(cap) # TODO: Make get_cap_in_answer_prefix ignroe inside of parenthesis "(...)"
 
     while len(answer_list) != cap if cap else True:
         i = len(answer_list) + 1
-        answer_prefix = _create_list_answer_prefix(input_prefix, i, ordered, cap, input_suffix)
+        answer_prefix = create_list_answer_prefix(input_prefix, i, ordered, cap, input_suffix)
         answer = input(answer_prefix)
         if not answer:
             break
@@ -79,17 +83,17 @@ def _answer_as_list(input_prefix, ordered=False, cap=None, input_suffix=''):
 
 def answer_question_as_list(question, input_prefix='• ', ordered=False, cap=None, input_suffix=''):
     if cap == 'auto':
-        cap = _get_cap_in_answer_prefix(question)
+        cap = get_cap_in_answer_prefix(question)
         print(cap)
     if cap and not ordered:
-        answer_list = _answer_as_list(question, ordered, cap, input_suffix)
+        answer_list = answer_as_list(question, ordered, cap, input_suffix)
     else:
         print(question)
-        answer_list = _answer_as_list(input_prefix, ordered, cap, input_suffix)
+        answer_list = answer_as_list(input_prefix, ordered, cap, input_suffix)
     return answer_list
 
 
-def _answer_as_text():
+def answer_as_text():
     answer_list = []
     while True:
         answer = input('')
@@ -105,7 +109,7 @@ def answer_question_as_text(question):
     print(question)
     help_text = '(linebreaks are enabled. To end reflection, press "." on a new line and press enter)'
     print(help_text)
-    answer = _answer_as_text()
+    answer = answer_as_text()
     return answer
 
 
@@ -119,7 +123,7 @@ def answer(question, answer_type, **kwargs):
     return answer
 
 
-def _create_question_index_suffix(question, question_list):
+def create_question_index_suffix(question, question_list):
     question_index_suffix = f' ({question_list.index(question) + 1} out of {len(question_list)})'
     return question_index_suffix
 
@@ -128,7 +132,7 @@ def answer_list(question_list, answer_type, show_question_index=False, **kwargs)
     all_answer_list = []
     for question in question_list:
         if show_question_index:
-            question += _create_question_index_suffix(question, question_list)
+            question += create_question_index_suffix(question, question_list)
         question_answer = answer(question, answer_type, **kwargs)
         all_answer_list.append(question_answer)
     return all_answer_list

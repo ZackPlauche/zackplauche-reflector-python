@@ -367,7 +367,7 @@ class Activities():
     def reflect(self):
 
         reflection = answer(
-            'Take a minute to write a written reflection.\n(linebreaks are enabled. To end reflection, press "." on a new line and press enter)')
+            'Take a minute to write a written reflection.\n''(linebreaks are enabled. To end reflection, press "." on a new line and press enter)')
 
         return reflection
 
