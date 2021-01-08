@@ -6,51 +6,19 @@ import re
 from datetime import datetime
 from pathlib import Path
 
+from answer import answer_question, answer_question_list
 
-def activity(activity_name, question_list, frequency=None, ordered=False, cap=None, **kwargs):
-    '''Shorter format for added funcionality for each reflector activity.'''
-
-    # Add frequency if frequency is defined
-    if frequency:
-        question_list = add_frequency(question_list, frequency)
-
-        # Add the frequency to the activities name
-        activity_name = f'{activity_name} ({frequency})'
-
-    # Walk through question_list and collect answer data
-    activity_data = answer(question_list, answer_type='listed', ordered=ordered, cap=cap)
-
-    # If kwarg "export" exists, export data as it should be exported.
-    if kwargs.get('export'):
-        if kwargs.get('export') == 'report':
-            try:
-                export(activity_name.title(), activity_data, report=kwargs.get('columns'))
-            except:
-                raise Exception('Must include the keyword argument of "columns" which must equal a list of columns.')
-        elif kwargs.get('export') == 'date':
-            export(activity_name.title(), activity_data, date=True)
-        else:
-            export(activity_name.title(), activity_data)
-
-    # Return activity data
-    return activity_data
 
 
 def arg_check(arg_name, response_list, arg):
-    if type(response_list) == str:
-        appropriate_response = response_list
-    else:
-        appropriate_response = f'either {", ".join(response_list[:-1])} or {response_list[-1]}'
-
+    appropriate_response = f'either {", ".join(response_list[:-1])} or {response_list[-1]}'
     if arg not in response_list:
         raise Exception(
             f'Arugument "{arg_name}" must equal {appropriate_response}. Please check your spelling and try again.')
 
-
 def add_frequency(question_list, frequency):
     '''Add frequency to a question or series of question_list'''
-    # Lowercase frequency to ensure proper string format is standard from the beginning
-    frequency = frequency.lower()
+    frequency = frequency.casefold()
     arg_check('frequency', ['daily', 'weekly', 'monthly', 'yearly', 'tomorrow'], frequency)
 
     # Add a time to add to the question_list
@@ -280,7 +248,7 @@ def list_reflector(filename, topic, question, directory='Data Storage', **kwargs
         choice = pick_option(f'Would you like to add to or rewrite your {topic}?', ['add', 'rewrite', 'remove', 'no'])
         if not choice in {'no', 'n', ''}:
             if choice != 'remove':
-                new_items = answer(question, answer_type='listed', ordered=True)
+                new_items = answer(question, answer_type='list', ordered=True)
                 if choice == 'add':
                     print(f'Exporting {topic[0].upper() + topic[1:]}...\n')
                     export(title, new_items)
@@ -311,7 +279,7 @@ def list_reflector(filename, topic, question, directory='Data Storage', **kwargs
 
     # Write goals for the first time.
     else:
-        topic_items = answer(question, type='listed', ordered=True)
+        topic_items = answer(question, type='list', ordered=True)
         export(title, topic_items)
 
         return topic_items
@@ -402,6 +370,35 @@ def smart_choice(menu_items):
                 except:
                     continue
     return choice
+
+def activity(activity_name, question_list, frequency=None, **kwargs):
+    '''Shorter format for added funcionality for each reflector activity.'''
+
+    if frequency:
+        question_list = add_frequency(question_list, frequency)
+
+        # Add the frequency to the activities name
+        activity_name = f'{activity_name} ({frequency})'
+
+    # Walk through question_list and collect answer data
+    activity_data = answer_question_list(question_list, answer_type='list', ordered=ordered, cap=cap)
+
+    # If kwarg "export" exists, export data as it should be exported.
+    if kwargs.get('export'):
+        if kwargs.get('export') == 'report':
+            try:
+                export(activity_name.title(), activity_data, report=kwargs.get('columns'))
+            except:
+                raise Exception('Must include the keyword argument of "columns" which must equal a list of columns.')
+        elif kwargs.get('export') == 'date':
+            export(activity_name.title(), activity_data, date=True)
+        else:
+            export(activity_name.title(), activity_data)
+
+    # Return activity data
+    return activity_data
+
+
 
 
 def test():

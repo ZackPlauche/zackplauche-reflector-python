@@ -8,6 +8,8 @@ import pandas as pd
 import time
 import os
 
+from answer import answer, answer_list
+
 
 class Activities():
 
@@ -77,8 +79,8 @@ class Activities():
 
             if stage_questions in acclaim_system_questions[:3]:
                 # Ask questions for user to answer
-                status = answer(stage_questions,
-                                answer_type='oneoff', yorn=True)
+                status = answer_list(stage_questions,
+                                     answer_type='inline', yesno=True)
 
                 # Populate hierarchy stage integrity
                 stage_integrity = integrity(stage_questions, status)
@@ -89,23 +91,23 @@ class Activities():
 
             # Self-esteem questions
             elif stage_questions is acclaim_system_questions[3]:
-                self_esteem = answer(
-                    stage_questions, answer_type='listed', ordered=True, cap='auto')
+                self_esteem = answer_list(
+                    stage_questions, answer_type='list', ordered=True, cap='auto')
 
             # Self-actualization questions
             elif stage_questions is acclaim_system_questions[4]:
-                favorite_project = answer(
-                    stage_questions[0], answer_type='oneoff')
+                favorite_project = answer_list(
+                    stage_questions[0], answer_type='inline')
                 print()
-                action_lists = answer(
-                    stage_questions[1:4], answer_type='listed', ordered=True)
-                share = answer(
-                    stage_questions[4], answer_type='oneoff', yorn=True)
+                action_lists = answer_list(
+                    stage_questions[1:4], answer_type='list', ordered=True)
+                share = answer_list(
+                    stage_questions[4], answer_type='inline', yesno=True)
 
     def life_addition(self):
 
         addition = answer('What can you bring into your day to upgrade your performance?',
-                          answer_type='listed', ordered=True, cap=1)
+                          answer_type='list', ordered=True, cap=1)
 
         export('Life Additions', addition, report=['Additions'])
 
@@ -121,7 +123,7 @@ class Activities():
         ]
 
         print("Take a deep breath...\n")
-        breath = answer(realization_questions, answer_type='yorn')
+        breath = answer_list(realization_questions, answer_type='inline', yesno=True)
         print("Take another deep breath...\n")
 
     def start_stop_keep(self):
@@ -177,13 +179,13 @@ class Activities():
             'What kind of person do I want to be today?'
         ]
 
-        answer(dave_asprey_questions[0], answer_type='listed', ordered=True)
-        answer(dave_asprey_questions[1:])
+        answer(dave_asprey_questions[0], answer_type='list', ordered=True)
+        answer_list(dave_asprey_questions[1:])
 
     def easier_life(self):
 
         easier_ideas = answer(
-            'Name an idea to make your life easier', answer_type='oneoff', loop=5)
+            'Name an idea to make your life easier', answer_type='list', cap=5)
         print()
 
         export('Easy Ideas', easier_ideas)
@@ -204,7 +206,7 @@ class Activities():
 
         # Make a list of things you appreciate
         gratitude = answer(
-            'What are you grateful for?', answer_type='listed', ordered=True)
+            'What are you grateful for?', answer_type='list', ordered=True)
 
         # Add them to a list that builds overtime
         export('Gratitude List', gratitude, date=True)
@@ -241,8 +243,8 @@ class Activities():
         ]
 
         # Collect answers from Health input & return a score
-        health_results = answer(health_analysis_questions,
-                                answer_type='oneoff', yorn=True)
+        health_results = answer_list(health_analysis_questions,
+                                answer_type='inline', yesno=True)
         print()  # Linebreak
 
         # Send data to a spreadsheet to keep track of progress overtime.
@@ -251,7 +253,7 @@ class Activities():
 
     def improvements(self):
 
-        improvements = answer('What can you do to improve?', 'listed')
+        improvements = answer('What can you do to improve?', answer_type='list')
 
         export('Improvements', improvements)
 
@@ -259,7 +261,7 @@ class Activities():
 
     def intentions(self):
 
-        intentions = answer("What are your intentions for the day?", 'listed')
+        intentions = answer("What are your intentions for the day?", answer_type='list')
 
         export('Intentions', intentions)
 
@@ -269,7 +271,7 @@ class Activities():
         '''Allows user to share what lessons they've learned this day.'''
 
         lessons = answer(
-            "What lessons did you learn or relearn today?", answer_type="listed")
+            "What lessons did you learn or relearn today?", answer_type="list")
 
         export('Daily Lessons', lessons, date=True)
 
@@ -278,14 +280,14 @@ class Activities():
     def life_givers(self):
 
         life_givers = answer(
-            'What life-giving situations did you experience today?', answer_type='listed')
+            'What life-giving situations did you experience today?', answer_type='list')
 
         export('Life Givers', life_givers)
 
     def meaningful_experience(self):
 
         meaningful_experience = answer(
-            'What was one meaningful experience you had today?')
+            'What was one meaningful experience you had today?', answer_type='text')
 
         print(meaningful_experience)
 
@@ -295,7 +297,7 @@ class Activities():
 
     def not_doing(self):
 
-        not_doing = answer('What are you not doing?', answer_type='listed')
+        not_doing = answer('What are you not doing?', answer_type='list')
 
         return not_doing
 
@@ -304,7 +306,7 @@ class Activities():
 
         # Collect a list of ingredients the user is going to eat for breakfast
         ingredients = answer(
-            f'What healthy {meal} ingredients are you going to eat today?', answer_type='listed')
+            f'What healthy {meal} ingredients are you going to eat today?', answer_type='list')
 
         # Check if this compination ingredients is a new recipe
         # recipe_check = input('Is this a new recipe? (y/n): ')
@@ -316,7 +318,7 @@ class Activities():
         # 	print(f'{recipe} has been added to Recipe List!')
 
         supplements = answer(
-            'What supplements are you going to take with your meal?', answer_type='listed')
+            'What supplements are you going to take with your meal?', answer_type='list')
 
         # Linebreak
         print()
@@ -333,9 +335,9 @@ class Activities():
             "What can you do to turn this around?"
         ]
 
-        status = answer(questions[:1], answer_type="oneoff", yorn=True)
+        status_list = answer_list(questions[:2], answer_type="inline", yesno=True)
         reflection = answer(questions[2])
-        actions = answer(questions[3], answer_type="listed")
+        actions = answer(questions[3], answer_type="list")
 
     def operation_red_dragon(self):
         "For when she's on her period."
@@ -383,7 +385,7 @@ class Activities():
         ]
 
         physiology_stats = answer(
-            physiology_questions, answer_type='oneoff', yorn=True)
+            physiology_questions, answer_type='inline', yesno=True)
 
         physiology_score = integrity(physiology_questions, physiology_stats)
 
@@ -406,7 +408,7 @@ class Activities():
         ]
 
         security_stats = answer(
-            security_questions, answer_type='oneoff', yorn=True)
+            security_questions, answer_type='inline', yesno=True)
 
         security_score = integrity(security_questions, security_stats)
 
@@ -428,7 +430,7 @@ class Activities():
         ]
 
         love_and_belonging_stats = answer(
-            love_and_belonging_questions, answer_type='oneoff', yorn=True)
+            love_and_belonging_questions, answer_type='inline', yesno=True)
 
         love_and_belonging_score = integrity(
             love_and_belonging_questions, love_and_belonging_stats)
@@ -455,8 +457,8 @@ class Activities():
             'Who do I love? Who loves me?'
         ]
 
-        # Answers each question in a listed answer format.
-        answer(tony_robbins_power_questions, answer_type='listed',
+        # Answers each question in a list answer format.
+        answer(tony_robbins_power_questions, answer_type='list',
                ordered=True, question_index=True)
 
     def priorities(self, frequency=None, write_checklist=False):
@@ -508,10 +510,10 @@ class Activities():
 
         goal = input(prismatic_questions[0])
         print()
-        resources = answer(prismatic_questions[1:6], answer_type='listed')
+        resources = answer(prismatic_questions[1:6], answer_type='list')
         action_plan = answer(
-            prismatic_questions[6:8], answer_type='listed', ordered=True)
-        resources.append(answer(prismatic_questions[8:]), answer_type='listed')
+            prismatic_questions[6:8], answer_type='list', ordered=True)
+        resources.append(answer(prismatic_questions[8:]), answer_type='list')
 
         return resources, action_plan
 
@@ -528,7 +530,7 @@ class Activities():
         '''Gives the user an opportunity to share some love to themselves.'''
 
         # Asks 10 reasons why the user loves themself.
-        self_love_reasons = answer('List 10 reasons why you love yourself.', answer_type='listed', ordered=True,
+        self_love_reasons = answer('List 10 reasons why you love yourself.', answer_type='list', ordered=True,
                                    cap='auto')
 
         export('Self-Love List', self_love_reasons)
@@ -538,7 +540,7 @@ class Activities():
     def stressors(self):
 
         stressors = answer(
-            'What stressors (if any) did you experience today and how can you resolve them?', answer_type='listed')
+            'What stressors (if any) did you experience today and how can you resolve them?', answer_type='list')
 
         export('Stressors', stressors)
 
@@ -673,7 +675,7 @@ class Activities():
             metrics += metric_dict.keys()
             metric_questions += metric_dict.values()
 
-        success_metrics = answer(metric_questions, answer_type='oneoff')
+        success_metrics = answer(metric_questions, answer_type='inline')
         print()
 
         export('Success Metrics 2020-6-27', success_metrics,
@@ -695,7 +697,7 @@ class Activities():
 
         # Collect 10 ideas in a list
         ideas = answer(f'Name an idea to {topic}',
-                       answer_type='oneoff', loop=10)
+                       answer_type='inline', loop=10)
         print()  # Linebreak
 
         # Send ideas to an ideas list
@@ -712,7 +714,7 @@ class Activities():
     def turn_around(self):
 
         turn_around = answer(
-            'What actions can you take to turn this around?', answer_type='listed')
+            'What actions can you take to turn this around?', answer_type='list')
 
         return turn_around
 
@@ -720,7 +722,7 @@ class Activities():
         """Allows the user to choose what type of person they're going to be that day."""
 
         type_of_person = answer(
-            "What type of person do you choose to be today?", answer_type="listed")
+            "What type of person do you choose to be today?", answer_type="list")
         print()
 
         return type_of_person
