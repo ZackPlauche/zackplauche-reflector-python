@@ -1,4 +1,5 @@
 import re
+import csv
 from datetime import datetime
 from pathlib import Path
 
@@ -29,7 +30,7 @@ def add_frequency(question_list, frequency):
 
     updated_question_list = [f'{question[:-1]} for {time}?' for question in question_list]
 
-    return question_list
+    return updated_question_list
 
 
 def display(file_name, directory_name='Data Storage', keep='text'):
@@ -59,7 +60,25 @@ def display(file_name, directory_name='Data Storage', keep='text'):
 
         return tuple(file_data_list)
 
-def export(answer_data, file_name: str, directory_name='Data Storage', overwrite=False, **kwargs):
+def determine_file_type_to_export(data, file_path, report=False):
+        file_suffix = 'csv' if report else 'txt'
+        return file_suffix
+
+def format_data_for_export(data):
+        formatted_data = tuple([data]) if type(data) is str else tuple(data)
+        return formatted_data
+
+def determine_file_mode(file_path, overwrite=False):
+    mode = 'w+' if not file_path.exists() or overwrite else 'a+'
+    return mode
+
+def get_datetime_now_vars():
+    date = datetime.now().strftime('%#m/%#d/%Y')
+    day = datetime.now().strftime('%A')
+    time = datetime.now().strftime('%I:%H %p').lstrip('0').lower()
+    return date, day, time
+
+def export(answer_data, file_name: str, directory_name='Data Storage', overwrite=False, answer_column_headers=None, **kwargs):
     '''Exports data into a file for storage.
 
     :param report: add a list of column names for your report.
@@ -68,129 +87,85 @@ def export(answer_data, file_name: str, directory_name='Data Storage', overwrite
     directory = Path('.') / directory_name
     directory.mkdir(exist_ok=True)
     file_path = directory / file_name
+    new_file_type = determine_file_type_to_export(answer_data, file_path, answer_column_headers)
+    formatted_answer_data = format_data_for_export(answer_data)
+    mode = determine_file_mode(file_path, overwrite)
+    file = open(file_path, mode, newline='') if new_file_type == 'csv' else open(file_path, mode)
+
+    # Time variables for csv reports and text files that add dates to their entry.
+
+    def export_to_csv(data, path):
+        writer = csv.writer(file)
+        time_column_headers = ['Date', 'Day', 'Time']
+        date, day, time = get_datetime_now_vars()
+        time_column_data = [date, day, time]
 
 
-    # Determine the type of file.
-    def determine_file_type_to_export(data, file_path, report=False):
-        file_suffix = 'csv' if report else 'txt'
-        return file_suffix
-    
-    new_file_type = determine_file_type_to_export(answer_data, file_path, kwargs.get('report'))
+    if new_file_type == 'csv':
+        writer = csv.writer(file)
+        time_answer_column_headers = ['Date', 'Day', 'Time']
+        time_column_data = [todays_date, today, time]
+        column_headers = time_answer_column_headers + answer_column_headers
 
-    def format_data_for_export(data):
-        formatted_data = tuple([data]) if type(data) is str else tuple(data)
-        return formatted_data
-        
-    formatted_ansewr_data = format_data_for_export(answer_data)
+        # If file is in write mode, add a header row
+        print(file.mode)
+        if file.mode == 'w+':
+            writer.writerow(column_headers)
 
-    # See if file is a txt or a csv, and if so perform the following actions.
-    if new_file_type in {'txt', 'csv'}:
+        # If the data contains a nested list, join each list of answers into a single answer and put it into a list
+        if type(formatted_answer_data[0]) is list:
+            writer.writerow(time_column_data + [', '.join(answer) for answer in formatted_answer_data])
 
-        def determine_file_mode(file_path, overwrite=False):
-            mode = 'w+' if not file_path.exists() or overwrite else 'a+'
-            return mode
-        
-        mode = determine_file_mode(file_path, overwrite)
-
-        
-
-        file = open(file_path, mode, newline='')
-
-        # If a file doesn't exist, or is being overwritten, write it.
-        mode = 'w+' if not file_path.exists() or overwrite else 'a+'
-        if not file_path.exists() or overwrite:
-            if new_file_type == 'csv':
-                file = open(file_path, 'w+', newline='')
-            elif new_file_type == 'txt':
-                file = open(file_path, 'w+')
-
-        # If a file does exist, append to it.
+        # Otherwise, join the data and add it to the report.
         else:
-            if new_file_type == 'csv':
-                file = open(file_path, 'a+', newline='')
-            elif new_file_type == 'txt':
-                file = open(file_path, 'a+')
-
-        # Create time variables for csv reports and text files that add dates to their entry.
-        now = datetime.now()
-        todays_date = f'{now.month}/{now.day}/{now.year}'
-        time = datetime.now().strftime('%#m/%#d/%Y')
-        today = now.strftime('%A')
-        time = now.strftime("%I:%M %p").lstrip('0')
-
-        # Write report/csv if new_file_type is csv.
-        if new_file_type == 'csv':
-
-            # Define csv writer
-            writer = csv.writer(file)
-
-            # Add time tracking columns to csv reports.
-            if kwargs.get('report'):
-                time_column_headers = ['Date', 'Day']
-                time_column_data = [todays_date, today]
-            if kwargs.get("time") == 'full':
-                time_column_headers.append('Time')
-                time_column_data.append(time)
-
-            # If file is in write mode, add a header row
-            print(file.mode)
-            if file.mode == 'w+':
-                writer.writerow(time_column_headers + kwargs.get('report'))
-
-            # If the data contains a nested list, join each list of answers into a single answer and put it into a list
-            if type(data[0]) is list:
-                writer.writerow(time_column_data + [', '.join(answer) for answer in data])
-
-            # Otherwise, join the data and add it to the report.
+            if len(', '.join(formatted_answer_data)) is len(answer_column_headers):
+                writer.writerow(time_column_data + [', '.join(formatted_answer_data)])
             else:
-                if len(', '.join(data)) is len(kwargs.get('report')):
-                    writer.writerow(time_column_data + [', '.join(data)])
-                else:
-                    writer.writerow(time_column_data + data)
+                writer.writerow(time_column_data + formatted_answer_data)
 
-        elif new_file_type == 'txt':
+    elif new_file_type == 'txt':
 
-            # Write title of text file if file is in write mode.
-            if file.mode == 'w+':
-                file.write(f'{filename}:\n\n')
+        # Write title of text file if file is in write mode.
+        if file.mode == 'w+':
+            file_title_text = f'{file_name}:\n\n'
+            file.write(f'{file_name}:\n\n')
 
+        try:
+            file.seek(0)
+            last_line = file.readlines()[-1]
+            last_index_regex = re.compile('(\d+).')
+            last_index_match = last_index_regex.search(last_line)
+            index = int(last_index_match.group(1)) + 1
+        except:
+            index = 1
+
+        # Text report template
+        if answer_column_headers:
+            question_list = answer_column_headers
+            for answer, question in zip(formatted_answer_data, question_list):
+                file.write(f'Question {kwargs.get("report").index(question) + 1}: {question}\n\nAnswer: {answer}')
+
+        # List Template
+        else:
+            # Write date if date is not in file text
+            file.seek(0)
             try:
-                file.seek(0)
-                last_line = file.readlines()[-1]
-                last_index_regex = re.compile('(\d+).')
-                last_index_match = last_index_regex.search(last_line)
-                index = int(last_index_match.group(1)) + 1
+                filetext = file.read()
+                date_match = re.compile(todays_date).search(filetext).group()
             except:
-                index = 1
 
-            # Text report template
-            if kwargs.get('report'):
-                question_list = kwargs.get('report')
-                for answer, question in zip(data, question_list):
-                    file.write(f'Question {kwargs.get("report").index(question) + 1}: {question}\n\nAnswer: {answer}')
-
-            # List Template
+                date_match = None
+            if date_match == todays_date:
+                print('Skipping Date...\n')
             else:
-                # Write date if date is not in file text
-                if kwargs.get('date'):
-                    file.seek(0)
-                    try:
-                        filetext = file.read()
-                        date_match = re.compile(todays_date).search(filetext).group()
-                    except:
+                print('Adding Date...\n')
+                file.write(f'\n{todays_date}\n')
 
-                        date_match = None
-                    if date_match == todays_date:
-                        print('Skipping Date...\n')
-                    else:
-                        print('Adding Date...\n')
-                        file.write(f'\n{todays_date}\n')
-
-                for item in data:
-                    if item:
-                        file.write(f'{index}. {item}\n')
-                        index += 1
-            file.close()
+            for item in formatted_answer_data:
+                if item:
+                    file.write(f'{index}. {item}\n')
+                    index += 1
+        file.close()
 
 
 def integrity(yorn_question_list_list, yorn_answers, dependency=None):
