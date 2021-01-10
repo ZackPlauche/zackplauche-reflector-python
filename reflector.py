@@ -2,9 +2,33 @@
 # -*- coding: utf-8 -*-
 import time
 import os
-from activities import MainActivities
-from utils import smart_choice
+from config.activities import MainActivities
+from config.utils import smart_choice
+from config.activities import *
 
+def print_reflector_intro():
+    print('\nWelcome to Reflector!')
+    print('\nPlease choose an activity.\n')
+
+activity_dict = {
+    'Morning Reflection': print,
+    'End of Day Reflection': print,
+    'Success Metrics': print,
+    'Weekly Reflection': print,
+    'Monthly Reflection': print,
+    # 'Birthday Reflection': print,
+    'Acclaim System': print,
+    'Prismatic System': print,
+    # '10 Ideas': print,
+    # 'Goals': print,
+    # 'Priorities': print,
+    'Physiology Check': print,
+    'Off The Wagon': print,
+    'Operation SELF': print,
+    'Operation Red Dragon': print,
+}
+
+def select_activity(activity_dict):
 
 
 class Reflector(MainActivities):
@@ -13,12 +37,6 @@ class Reflector(MainActivities):
 
     def __init__(self, activity=None):
         self.activity = activity
-
-
-    def intro(self):
-        '''Introduction to the program.'''
-        print('\nWelcome to Reflector!')
-        print('\nPlease choose an activity.\n')
 
     def selector(self):
         '''
@@ -31,21 +49,7 @@ class Reflector(MainActivities):
         else:
 
             activity_list = [
-                'Morning Reflection',
-                'End of Day Reflection',
-                'Success Metrics',
-                'Weekly Reflection',
-                'Monthly Reflection',
-                # 'Birthday Reflection',
-                'Acclaim System',
-                'Prismatic System',
-                # '10 Ideas',
-                # 'Goals',
-                # 'Priorities',
-                'Physiology Check',
-                'Off The Wagon',
-                'Operation SELF',
-                'Operation Red Dragon',
+                
 
             ]
 

@@ -1,13 +1,10 @@
-from answer import answer, answer_list
-from export import export_to_csv
+from config.answer import answer_question, answer_questions, answer_question_dict
+from config.export import export_to_csv
 
 
-questions = [
-    'What did you do today?',
-    'What are you grateful for?',
-    'What are you going to do tomorrow?',
-]
+question_dict = {
+    'How was your day on a scale from one to 10?': {'answer_type': 'list', 'cap': 'auto'}
+}
+answer = answer_question_dict(question_dict)
 
-one_answer = answer('Who are you?', 'inline')
-
-export_to_csv(one_answer, ['Q'], 'test', overwrite=True)
+export_to_csv(answer, list(question_dict.keys()), 'test', overwrite=True)

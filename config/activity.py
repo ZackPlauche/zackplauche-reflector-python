@@ -1,9 +1,10 @@
 import re
-import csv
-from datetime import datetime
+from time import sleep
 from pathlib import Path
 
-from utils import casefold_all
+from .answer import answer_question, answer_questions, answer_question_dict
+from .export import export_to_csv
+from .utils import casefold_all
 
 def validate_arg(arg_name, arg_options, arg):
     arg_name, arg_options = casefold_all(arg_name, arg_options)
@@ -107,15 +108,7 @@ def export_as_txt(data, file_name, overwrite=False, column_list=None):
     open_file.close()
 
 
-def get_integrity_status(yesno_question_list, yesno_answer_list, dependency=None):
-    '''
-    Takes in a list of yes or no answers and their resopnses and converts them to a total percentage value
-    based on a y to n ratio.
-    '''
-    integrity_slice = 100 / len(yesno_question_list)
-    integrity = sum([integrity_slice for answer in yesno_answer_list if answer in {'y', 'yes'}]).__int__()
-    integrity_status = f'{integrity}%'
-    return integrity_status
+
 
 
 def list_reflector(filename, topic, question, directory='Data Storage', **kwargs):
@@ -203,92 +196,65 @@ def pick_option(question, acceptable_answers):
 
     return choice
 
+def print_choice_list(choice_list):
+        for choice in choice_list:
+            choice_index = choice_list.index(choice) + 1
+            print(f'{choice_index}. {choice}')
 
-def smart_choice(menu_items):
+def get_choice_range(choice_list):
+    choice_range = f'(from 1 to {len(choice_list)})'
+    return choice_range
+
+def check_if_int(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
+
+def validate_choice_number(choice_number, choice_list):
+    choice_is_valid = True
+    if not choice_number:
+        error = '\nAnswer cannot be left blank.\n'
+        print(error)
+        sleep(1)
+        choice_is_valid = False
+    elif not check_if_int(choice_number):
+        error = '\nAnswer must be a whole number\n'
+        print(error)
+        sleep(1)
+        choice_is_valid = False
+    elif check_if_int(choice_number) and not int(choice_number) in range():
+        error = 'Answer out of range.'
+        help_text = f'Please enter a number between 1 and {len(choice_list)}.'
+        print(f'\n{error} {help_text}\n')
+        sleep(1)
+        choice_is_valid = False
+    return choice_is_valid
+
+
+def smart_choice(choice_list):
     '''
-    :param menu_items: Allows user to input list of activities to do to return a choice.
+    :param choice_list: Allows user to input list of activities to do to return a choice.
     :returns : Exact item chosen through the items index.
     '''
+    print_choice_list(choice_list)
+    while True:
+        choice_number = input(f'\nActivity number {get_choice_range(choice_list)}: ')
+        if validate_choice_number(choice_number, choice_list):
+            return choice_number
 
-    choice_range = f'(from {menu_items.index(menu_items[0]) + 1} to {menu_items.index(menu_items[-1]) + 1})'
-
-    for item in menu_items:
-        print(f'{menu_items.index(item) + 1}) {item}')
-
-    choice = input(f'\nActivity number {choice_range}: ')
-    print()
-    if choice != '':
-        try:
-            if int(choice) in range(len(menu_items) + 1):
-                pass
-            else:
-                while True:
-                    print("ERROR: Given Response outside the number range.\n")
-                    choice = input("Please enter activity number next to corresponding acivity: ")
-
-                    if int(choice) in range(len(menu_items + 1)):
-                        break
-            choice = menu_items[int(choice) - 1]
-
-            print('\n')
-        except:
-            while True:
-                print("ERROR: Given response was not a number.\n")
-                choice = input("Please enter activity number next to corresponding acivity: ")
-                print()
-
-                try:
-                    if int(choice) in range(len(menu_items)):
-                        pass
-                    else:
-                        while True:
-                            print("ERROR: Given Response outside the number range.\n")
-                            choice = input("Please enter activity number next to corresponding acivity: ")
-                            print()
-
-                            if int(choice) in range(len(menu_items)):
-                                break
-                    choice = menu_items[int(choice) - 1]
-                    break
-                except:
-                    continue
-
-                try:
-                    if choice in [str(menu_items.index(item) + 1) for item in menu_items]:
-                        choice = menu_items[int(choice) - 1]
-                        print()
-                        break
-                except:
-                    continue
-    return choice
-
-
-def activity(activity_name, question_list, frequency=None, **kwargs):
-    '''Shorter format for added funcionality for each reflector activity.'''
-
-    if frequency:
-        question_list = add_frequency(question_list, frequency)
-
-        # Add the frequency to the activities name
-        activity_name = f'{activity_name} ({frequency})'
-
-    # Walk through question_list and collect answer data
-    activity_data = answer_question_list(question_list, answer_type='list', ordered=ordered, cap=cap)
-
-    # If kwarg "export" exists, export data as it should be exported.
-    if kwargs.get('export'):
-        if kwargs.get('export') == 'report':
-            try:
-                export(activity_name.title(), activity_data, report=kwargs.get('columns'))
-            except:
-                raise Exception('Must include the keyword argument of "columns" which must equal a list of columns.')
-        elif kwargs.get('export') == 'date':
-            export(activity_name.title(), activity_data, date=True)
-        else:
-            export(activity_name.title(), activity_data)
-
-    # Return activity data
-    return activity_data
+def activity(questions, file_name, **kwargs):
+    answer = ''
+    if type(questions) is str:
+        answer = answer_question(questions, **kwargs)
+    elif type(questions) is list:
+        answer = answer_questions(questions, **kwargs)
+    elif type(questions) is dict:
+        answer = answer_question_dict(questions)
+        questions = list(questions.keys())
+    export_to_csv(answer, questions, file_name)
+    return answer
 
 
 def test():

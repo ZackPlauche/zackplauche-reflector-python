@@ -1,6 +1,7 @@
 import re
 
-from utils import casefold_all
+from . import settings
+from .utils import casefold_all, debug
 
 
 def create_choice_help_text(choices: list):
@@ -67,10 +68,9 @@ def answer_as_list(input_prefix, ordered=False, cap=None, input_suffix=''):
     answer_list = []
     validate_list_answer_cap(cap)
     if cap == 'auto':
-        # print('Auto') # TODO: Make get_cap_in_answer_prefix ignroe inside of parenthesis "(...)"
+        debug('cap="auto"')
         cap = get_cap_in_answer_prefix(input_prefix)
-        # print(cap) # TODO: Make get_cap_in_answer_prefix ignroe inside of parenthesis "(...)"
-
+        debug(cap)
     while len(answer_list) != cap if cap else True:
         i = len(answer_list) + 1
         answer_prefix = create_list_answer_prefix(input_prefix, i, ordered, cap, input_suffix)
@@ -100,7 +100,7 @@ def answer_as_text():
         answer = '\n' if not answer else answer
         if answer == '.':
             break
-        answer_list.append()
+        answer_list.append(answer)
     text_answer = '\n'.join(answer_list)
     return text_answer
 
@@ -113,7 +113,8 @@ def answer_question_as_text(question):
     return answer
 
 
-def answer(question, answer_type, **kwargs):
+def answer_question(question, answer_type, **kwargs):
+    answer = ''  # Just to temporarily resolve answer unbound error until I find better solution
     if answer_type == 'inline':
         answer = answer_question_as_inline(question, kwargs.get('yesno'))
     elif answer_type == 'text':
@@ -128,14 +129,23 @@ def create_question_index_suffix(question, question_list):
     return question_index_suffix
 
 
-def answer_list(question_list, answer_type, show_question_index=False, **kwargs):
+def answer_questions(question_list, answer_type, show_question_index=False, **kwargs):
     all_answer_list = []
     for question in question_list:
         if show_question_index:
             question += create_question_index_suffix(question, question_list)
-        question_answer = answer(question, answer_type, **kwargs)
+        question_answer = answer_question(question, answer_type, **kwargs)
         all_answer_list.append(question_answer)
     return all_answer_list
+
+
+def answer_question_dict(question_dict):
+    answer_list = []
+    for question, answer_setting in question_dict.items():
+        answer = answer_question(question, **answer_setting)
+        answer_list.append(answer)
+    debug(answer_list)
+    return answer_list
 
 
 def test():
@@ -157,7 +167,7 @@ def test():
     # x = answer('What are your top 3 priorities?', answer_type='list', cap='auto')
     # x = answer('What did you do today?', answer_type='list', ordered=True, cap='auto')
     # x = answer('Top 3 priorities', answer_type='list', ordered=True, cap='auto')
-    x = answer_list(['What are your top 3 priorities?', 'How are you?', 'How many is 5?'], answer_type='list', show_question_index=True, ordered=True, cap='auto', input_suffix='I want to ')
+    x = answer_questions(['What are your top 3 priorities?', 'How are you?', 'How many is 5?'], answer_type='list', show_question_index=True, ordered=True, cap='auto', input_suffix='I want to ')
 
     print(x)
     pass
