@@ -104,7 +104,11 @@ def write_data_in_text_list_format(answer_data, open_txt_file):
             open_txt_file.write(f'{list_index}. {item}\n')
             list_index += 1
 
-def export_as_txt(answer_data, file_name, question_list=None,  overwrite=False):
+# export_to_txt argument mapping doesn't match export_to_csv, but
+# question_list is optional because the intention was to have a Q&A style
+# test file option. This is the best I knew how to do for now (even though its
+# a bit mess)
+def export_to_txt(answer_data, file_name, question_list=None,  overwrite=False):
     answer_data = clean_data_for_export(answer_data)
     file, file_mode = create_file(file_name, '.txt', overwrite)
     with open(file, file_mode) as file:

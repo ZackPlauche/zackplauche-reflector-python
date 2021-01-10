@@ -2,8 +2,9 @@ import re
 from time import sleep
 from pathlib import Path
 
+from . import settings
 from .answer import answer_question, answer_questions, answer_question_dict
-from .export import export_to_csv
+from .export import export_to_csv, export_to_txt
 from .utils import casefold_all
 
 def validate_arg(arg_name, arg_options, arg):
@@ -60,85 +61,39 @@ def display(file_name, keep='text'):
         return tuple(file_data_list)
 
 
-def export_as_txt(data, file_name, overwrite=False, column_list=None):
-    file_path = Path('Data Storage') / file_name
-    formatted_answer_data = format_data_for_export(data)
-    mode = determine_file_mode(file_path, overwrite)
-    open_file = open(file_path, mode)
-
-    # Write title of text open_file if open_file is in write mode.
-    if mode == 'w+':
-        file_title = f'{file_name}:\n\n'
-
-    try:
-        open_file.seek(0)
-        last_line = open_file.readlines()[-1]
-        last_index_regex = re.compile('(\d+).')
-        last_index_match = last_index_regex.search(last_line)
-        index = int(last_index_match.group(1)) + 1
-    except:
-        index = 1
-
-    # Text report template
-    if column_list:
-        question_list = column_list
-        for answer, question in zip(formatted_answer_data, question_list):
-            open_file.write(f'Question {kwargs.get("report").index(question) + 1}: {question}\n\nAnswer: {answer}')
-
-    # List Template
-    else:
-        # Write date if date is not in open_file text
-        open_file.seek(0)
-        try:
-            open_filetext = open_file.read()
-            date_match = re.compile(todays_date).search(filetext).group()
-        except:
-
-            date_match = None
-        if date_match == todays_date:
-            print('Skipping Date...\n')
-        else:
-            print('Adding Date...\n')
-            open_file.write(f'\n{todays_date}\n')
-
-        for item in formatted_answer_data:
-            if item:
-                open_file.write(f'{index}. {item}\n')
-                index += 1
-    open_file.close()
 
 
 
 
 
-def list_reflector(filename, topic, question, directory='Data Storage', **kwargs):
-    '''full_answer(filename, topic, question_list, **kwargs)
 
-    :param filename:
+def list_reflector(file_name, topic, question, directory='Data Storage', **kwargs):
+    '''full_answer(file_name, topic, question_list, **kwargs)
+
+    :param file_name:
     :param topic:
     :param question:
     :param kwargs:
     :return:
     '''
-
-    # Pulls title from filename
-    title = re.compile('(.+)\.').search(filename).group(1)
+    file = Path(settings.STORAGE_DIRECTORY) / file_name
+    title = file.name
 
     # Print/Display goals first if they exist already.
-    if os.path.exists(f'.\\{directory}\\{filename}'):
-        display_text, filetitle, items = display(filename, 'all')
+    if file.exists():
+        display_text, filetitle, items = display(file_name, 'all')
 
         # Add or Rewrite new items.
         choice = pick_option(f'Would you like to add to or rewrite your {topic}?', ['add', 'rewrite', 'remove', 'no'])
         if not choice in {'no', 'n', ''}:
             if choice != 'remove':
-                new_items = answer(question, answer_type='list', ordered=True)
+                new_items = answer_questions(question, answer_type='list', ordered=True)
                 if choice == 'add':
                     print(f'Exporting {topic[0].upper() + topic[1:]}...\n')
-                    export(title, new_items)
+                    export_to_txt(new_items, title)
                     print(f'{topic[0].upper() + topic[1:]} exported...')
                 elif choice == 'rewrite':
-                    export(title, new_items, overwrite=True)
+                    export_to_txt(new_items, title, overwrite=True)
             elif choice == 'remove':
                 print()
                 # Rewrite file without the removed number items
@@ -153,7 +108,7 @@ def list_reflector(filename, topic, question, directory='Data Storage', **kwargs
                     remove_items.append(items[number - 1])
                 for item in remove_items:
                     items.remove(item)
-                export(title, items, overwrite=True)
+                export_to_txt(title, items, overwrite=True)
                 return items
 
             # Put current topic_items in a list
@@ -163,8 +118,8 @@ def list_reflector(filename, topic, question, directory='Data Storage', **kwargs
 
     # Write goals for the first time.
     else:
-        topic_items = answer(question, type='list', ordered=True)
-        export(title, topic_items)
+        topic_items = answer_question(question, type='list', ordered=True)
+        export_to_txt(title, topic_items)
 
         return topic_items
 

@@ -5,23 +5,19 @@ import os
 from config.activities import MainActivities
 from config.utils import smart_choice
 from config.activities import *
+from config.main_activities import *
 
 def print_reflector_intro():
     print('\nWelcome to Reflector!')
     print('\nPlease choose an activity.\n')
 
 activity_dict = {
-    'Morning Reflection': print,
-    'End of Day Reflection': print,
-    'Success Metrics': print,
+    'Morning Reflection': morning_reflection,
+    'End of Day Reflection': end_of_day_reflection,
     'Weekly Reflection': print,
     'Monthly Reflection': print,
-    # 'Birthday Reflection': print,
     'Acclaim System': print,
     'Prismatic System': print,
-    # '10 Ideas': print,
-    # 'Goals': print,
-    # 'Priorities': print,
     'Physiology Check': print,
     'Off The Wagon': print,
     'Operation SELF': print,
@@ -30,6 +26,7 @@ activity_dict = {
 
 def select_activity(activity_dict):
 
+    pass
 
 class Reflector(MainActivities):
     '''Reflector(activity=None)

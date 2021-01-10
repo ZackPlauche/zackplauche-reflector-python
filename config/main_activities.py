@@ -12,7 +12,7 @@ def morning_reflection():
     intentions()
     gratitude()
     priorities('daily')
-    self_love()  # TODO: Accidentally deleted, need to restore to activities.py
+    # self_love()  # TODO: Accidentally deleted, need to restore to activities.py
     easier_life()
     ten_ideas()
     reflect()
@@ -27,7 +27,7 @@ def end_of_day_reflection():
     lessons()
     gratitude()
     meaningful_experience()
-    self_love()  # TODO: Accidentally deleted, need to restore to activities.py
+    # self_love()  # TODO: Accidentally deleted, need to restore to activities.py
     ten_ideas()
     goals()
     priorities(frequency='tomorrow')

@@ -4,7 +4,7 @@ import itertools
 
 from .utils import get_integrity_status
 from .answer import answer_question, answer_questions, answer_question_dict
-from .export import export_to_csv
+from .export import export_to_csv, export_to_txt
 
 
 def acclaim_system():
@@ -110,8 +110,7 @@ def easier_life():
     question = 'Name an idea to make your life easeir'
     easier_life_ideas = answer_question(question, 'list', cap=5)
     print()
-    # TODO: Build export to text list
-    export_to_csv(easier_life_ideas, question, 'Easier Life')
+    export_to_txt(easier_life_ideas, 'Easier Life')
     return easier_life_ideas
 
 
@@ -130,8 +129,7 @@ def gratitude():
     question = 'What are you grateful for?'
     gratitude_list = answer_question(question, 'list', ordered=True)
     file_name = 'Gratitude List'
-    # TODO: Build export to text list
-    export_to_csv(gratitude_list, question, file_name,)
+    export_to_txt(gratitude_list, file_name)
     print()
 
     return gratitude_list
@@ -140,8 +138,7 @@ def gratitude():
 def improvements():
     question = ['What can you do to improve?']
     improvements = answer_question(question, 'list')
-    # TODO: Build export to text list
-    export_to_csv(improvements, ['Improvements'], improvements)
+    export_to_txt(improvements, 'Improvements')
     return improvements
 
 
@@ -185,7 +182,6 @@ def operation_self():
 def operation_red_dragon():
     "For when she's on her period."
     print("\nSo, your women is on her period huh? Perfect. That's what this program is designed for.\n")
-
     print("""Here's what you should probably look at doing.
 
     1. Breathe, everything is going to be ok. And you have to be strong here, so start with this one.
@@ -208,16 +204,13 @@ def perfect_day(frequency):
 
 
 def reflect():
-
-    reflection = answer_question(
-        'Take a minute to write a written reflection.\n''(linebreaks are enabled. To end reflection, press "." on a new line and press enter)')
-
+    question = 'Take a minute to write a written reflection.'
+    reflection = answer_question(question, 'text')
     return reflection
 
 
 def physiology_check():
     '''Checks up on health stats for the day.'''
-
     questions = [
         'Do you feel well rested?',
         'Are you hydrated?',
@@ -227,94 +220,55 @@ def physiology_check():
         'Is your environment clean and organized?',
         'Do you feel complete wellness?'
     ]
-
     answers = answer_question(questions, 'inline', yesno=True)
-    file_name = 'health_stats'
-    physiology_score = get_integrity_status(questions, answers)
+    score = get_integrity_status(questions, answers)
     print(f'\nYour physiology is at {get_integrity_status(questions, answers)}.\n')
-
-    physiology_columns = ['Score', 'Well Rested', 'Hydrated', 'Well Fed',
-                          'Movement', 'Temperature', 'Clean Environment', 'Full of Health']
-
-    export_to_csv('Health Stats', [physiology_score] +
-                  physiology_stats, report=physiology_columns)
-
-    return physiology_stats
-
-
-def security_check():
-    '''Checks up on security stats for the day.'''
-
-    security_questions = [
-        'Are you financially well off or have a financial plan?',
-        'Are you physically safe?'
+    column_names = [
+        'Score',
+        'Well Rested',
+        'Hydrated',
+        'Well Fed',
+        'Movement',
+        'Temperature',
+        'Clean Environment',
+        'Full of Health'
     ]
-
-    security_stats = answer_question(
-        security_questions, 'inline', yesno=True)
-
-    security_score = integrity(security_questions, security_stats)
-
-    print(f'\nYour security is at {security_score}.\n')
-
-    security_columns = ['Score', 'Financially Sound', 'Physically Safe']
-
-    export('Security Stats', [security_score] +
-           security_stats, report=security_columns)
-
-    return security_stats
-
-
-def love_and_belonging_check():
-    '''Checks up on health stats for the day.'''
-
-    love_and_belonging_questions = [
-        'Have you messaged 5 of your friends saying "I appreciate you & you matter to me"?',
-        'Have you talked to your favorite person or Significant Other?'
-    ]
-
-    love_and_belonging_stats = answer_question(
-        love_and_belonging_questions, 'inline', yesno=True)
-
-    love_and_belonging_score = integrity(
-        love_and_belonging_questions, love_and_belonging_stats)
-
-    print(f'\nYour love and belonging is at {love_and_belonging_score}.\n')
-
-    love_and_belonging_columns = [
-        'Score', 'Friend Appreciation', 'Significant Other Communication']
-
-    export('Love and Belonging Stats', [
-        love_and_belonging_score] + love_and_belonging_stats, report=love_and_belonging_columns)
-
-    return love_and_belonging_stats
+    answers = [score] + answers
+    file_name = 'Health Stats'
+    export_to_csv(answers, column_names, file_name)
+    return answers
 
 
 def priorities(frequency=None, write_checklist=False):
-
     questions = [
-        f'What are your top 3 personal priorities (starting with The ONE Thing)?',
-        f'What are your top 3 professional priorities (starting with The ONE Thing)?'
+        'What are your top 3 personal priorities (starting with The ONE Thing)?',
+        'What are your top 3 professional priorities (starting with The ONE Thing)?'
     ]
-
-    priorities = activity('Priorities', questions,
-                          frequency=frequency, ordered=True, cap='auto')
-
-    columns = ['ONE Thing', 'Priority #2', 'Priority #3']
-
-    export("Personal Priorities", priorities[0], report=columns)
-    export("Work Priorities", priorities[1], report=columns)
-
-    if write_checklist == True:
-        title = f'{frequency} Priorities'.title()
-        tasklist(title, priorities, title, headings=['Personal', 'Work'])
-
+    personal_priorities, work_priorities = answer_questions(questions, 'list', ordered=True, cap='auto')
+    column_names = ['ONE Thing', 'Priority #2', 'Priority #3']
+    file_name = 'Priorities'
+    export_to_csv(personal_priorities, column_names, 'Personal Priorities')
+    export_to_csv(work_priorities, column_names, 'Work Priorities')
+    priorities = [personal_priorities, work_priorities]
     return priorities
 
 
 def prismatic_system():
     '''Walks user through Ryan Donaldson's PRISMATIC Goal Setting System.'''
-    prismatic_list = [
+    prismatic_questions_dict = {
+        'What is your goal?': {'answer_type': 'inline'},
+        'P: What People will you utilize to achieve your goal?': {'answer_type': 'list'},
+        'R: What Resources will you utilzie to achieve your goal?': {'answer_type': 'list'},
+        'I: What Identities will you embody to achieve your goal?': {'answer_type': 'list'},
+        'S: What are the Specifics of your goal?': {'answer_type': 'list'},
+        'M: What Metrics will you use to track progress towards goal?': {'answer_type': 'list'},
+        'A: What Actions will you take to achieve your goal?': {'answer_type': 'list', 'ordered': True},
+        'T: What are the Timelines for each action?': {'answer_type': 'list'},
+        'I: What Information will you utilize to achieve your goal?': {'answer_type': 'list'},
+        'C: What are your Criteria for Success to achieve this goal?': {'answer_type': 'list'},
+    }
+    column_names = [
+        'Goal',
         'People',
         'Resources',
         'Identity',
@@ -324,33 +278,23 @@ def prismatic_system():
         'Information',
         'Criteria for Success'
     ]
-    prismatic_questions_dict = {
-        'What is your goal?': {'answer_type': 'inline'},
-        'What people will you utilize to achieve your goal?': {'answer_type': 'list'},
-        'What resources will you utilzie to achieve your goal?': {'answer_type': 'list'},
-        'What identities will you embody to achieve your goal?': {'answer_type': 'list'},
-        'What are the specifics of your goal?': {'answer_type': 'list'},
-        'What metrics will you use to track progress towards goal?': {'answer_type': 'list'},
-        'What actions will you take to achieve your goal?': {'answer_type': 'list', 'ordered': True},
-        'What are the timelines for each action?': {'answer_type': 'list'},
-        'What information will you utilize to achieve your goal?': {'answer_type': 'list'},
-        'What are your Criteria for success to achieve this goal?': {'answer_type': 'list'},
-    }
     file_name = 'prismatic_goals'
     answers = answer_question_dict(prismatic_questions_dict)
-    export_to_csv(answers, list(prismatic_questions_dict.keys()), file_name)
+    export_to_csv(answers, column_names, file_name)
     return answers
 
+
 def check_for_topic():
-        print('Anything specific you want to accomplish?\n\n')
-        topic = answer_question('I\'d like to', 'inline')
-        if not topic:
-            topic = 'improve your life'
-        print()
-        return topic
+    print('Anything specific you want to accomplish?\n\n')
+    topic = answer_question('I\'d like to', 'inline')
+    if not topic:
+        topic = 'improve your life'
+    print()
+    return topic
+
 
 def ten_ideas(set_topic=False, frequency=None):
-    
+
     topic = check_for_topic() if set_topic else 'to improve your life'
     question = f'Name an idea to {topic}'
     answer = answer_question(question, 'list', cap=10)
@@ -359,6 +303,7 @@ def ten_ideas(set_topic=False, frequency=None):
         filename = f'{frequency} {file_name}'.title()
     export_to_csv(answer, question, file_name)
     return answer
+
 
 def type_of_person():
     question = 'What type of person do you choose to be today?'
@@ -372,75 +317,3 @@ def wins(frequency=None):
     wins = answer_question(question, 'list', orderd=True)
     print(f'\nTotal Wins: {len(wins)}\n')
     return wins
-
-
-def morning_reflection():
-    '''Reflection to get the day started in a positive, epic mindset.'''
-
-    print('Good morning handsome ;) \n')
-
-    reflect()
-    physiology_check()
-    goals()
-    type_of_person()
-    intentions()
-    gratitude()
-    priorities('daily')
-    self_love()  # TODO: Fix woopsie
-    easier_life()
-    ten_ideas_to_improve_your_life()
-    reflect()
-
-
-def end_of_day_reflection():
-
-    print('Good evening sir! :) \n')
-    reflect()
-    wins()
-    improvements()
-    lessons()
-    gratitude()
-    meaningful_experience()
-    self_love()
-    ten_ideas_to_improve_your_life()
-    goals()
-    priorities = priorities(frequency='tomorrow')
-    reflect()
-
-
-def weekly_reflection():
-    print('I hope you had a nice week sir! :)\n')
-
-    reflect()
-    wins('weekly')
-    improvements()
-    priorities = priorities('weekly')
-    ideas = ten_ideas('crush it this week.')
-    perfect_day = perfect_day('weekly')
-    reflect()
-
-
-def monthly_reflection():
-    print('Wow, a whole month. I hope you had a nice month sir! :)\n')
-
-    reflect()
-    wins('monthly')
-    improvements()
-    priorities = priorities('monthly')
-    ideas = ten_ideas('crush it this month.')
-    perfect_day = perfect_day('monthly')
-
-def birthday_reflection():
-    '''Reflection to be done on your birthday.'''
-    print('Happy birthday! :)\n')
-
-    wins('yearly')
-    improvements()
-    priorities = priorities('yearly')
-    ideas = ten_ideas('make this year your most amazing year so far.')
-
-
-def off_the_wagon():
-    reflect()
-    not_doing()
-    turn_around()
