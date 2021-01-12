@@ -115,8 +115,8 @@ def export_to_txt(file_name, answer_data, question_list=None,  overwrite=False):
         else:
             write_data_in_text_list_format(answer_data, file)
 
-def export(export_mode, answer_data, file_name, column_header_list, overwrite=False):
-    if export_mode in {'csv', '.csv'}:
-        export_to_csv(answer_data, file_name, column_header_list, overwrite)
-    elif export_mode in {'txt', '.txt'}:
-        export_to_txt(answer_data, file_name, overwrite)
+def export(export_to, file_name, answer_data, column_or_question_list, overwrite=False):
+    if export_to in {'csv', '.csv'}:
+        export_to_csv(answer_data, file_name, column_or_question_list, overwrite)
+    elif export_to in {'txt', '.txt'}:
+        export_to_txt(answer_data, file_name, column_or_question_list, overwrite)

@@ -3,7 +3,7 @@ import os
 import itertools
 
 from .utils import get_integrity_status
-from .answer import answer_question, answer_questions, answer_question_dict
+from .answer import answer_question, answer_questions, answer_questions_dict
 from .export import export_to_csv, export_to_txt
 from .activity import activity
 
@@ -69,7 +69,7 @@ def acclaim_system():
     print('Self-Esteem:\n'.upper())
     self_esteem_answers = answer_questions(self_esteem_questions, 'list', cap='auto')
     print('Self Actualtization:\n'.upper())
-    self_actualization_answers = answer_question_dict(self_actualization_questions_dict)
+    self_actualization_answers = answer_questions_dict(self_actualization_questions_dict)
 
     acclaim_system_answers = [
         psychology_answers,
@@ -182,7 +182,7 @@ def operation_self():
         "Go ahead and reflect for a minute to try to clear your brain.": {'answer_type': 'text'},
         "What can you do to turn this around?": {'answer_type': 'list'}
     }
-    answers = answer_question_dict(questions_dict)
+    answers = answer_questions_dict(questions_dict)
     export_to_csv('Operation Self', answers, questions_dict)
 
 
@@ -286,7 +286,7 @@ def prismatic_system():
         'Criteria for Success'
     ]
     file_name = 'prismatic_goals'
-    answers = answer_question_dict(prismatic_questions_dict)
+    answers = answer_questions_dict(prismatic_questions_dict)
     export_to_csv(answers, column_names, file_name)
     return answers
 

@@ -3,7 +3,7 @@ import re
 from config import settings
 from .utils import casefold_all
 
-__all__ = ['answer_question', 'answer_questions', 'answer_question_dict']
+__all__ = ['answer_question', 'answer_questions', 'answer_questions_dict']
 
 
 def _answer_as_inline(input_prefix):
@@ -189,9 +189,9 @@ def answer_questions(question_list, answer_type, show_question_index=False, **kw
     return all_answer_list
 
 
-def answer_question_dict(question_dict):
+def answer_questions_dict(questions_dict):
     answer_list = []
-    for question, answer_setting in question_dict.items():
+    for question, answer_setting in questions_dict.items():
         answer = answer_question(question, **answer_setting)
         answer_list.append(answer)
     return answer_list

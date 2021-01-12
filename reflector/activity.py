@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from .answer import answer_question, answer_questions, answer_question_dict
+from .answer import answer_question, answer_questions, answer_questions_dict
 from .export import export_to_csv, export_to_txt
 from .utils import casefold_all
 from config import settings
@@ -118,7 +118,7 @@ def activity(file_name, questions, **kwargs):
     elif type(questions) is list:
         answer = answer_questions(questions, **kwargs)
     elif type(questions) is dict:
-        answer = answer_question_dict(questions)
+        answer = answer_questions_dict(questions)
         questions = list(questions.keys())
     export_to_csv(answer, questions, file_name)
     return answer
