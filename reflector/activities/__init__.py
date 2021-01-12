@@ -1,11 +1,9 @@
-import time
-import os
 import itertools
 
-from .utils import get_integrity_status
-from .answer import answer_question, answer_questions, answer_questions_dict
-from .export import export_to_csv, export_to_txt
-from .activity import activity
+from reflector.answer import answer_question, answer_questions, answer_questions_dict
+from reflector.export import export_to_csv, export_to_txt
+from reflector.activity import activity
+from .utils import get_integrity_status, add_frequency_to_question
 
 def acclaim_system():
     '''
@@ -142,7 +140,7 @@ def self_love():
 
 
 def improvements():
-    question = ['What can you do to improve?']
+    question = 'What can you do to improve?'
     improvements = answer_question(question, 'list')
     export_to_txt('Improvements', improvements)
     return improvements
@@ -201,9 +199,11 @@ def operation_red_dragon():
     print('\nThat\'s all for now.')
 
 
-def perfect_day(frequency):
+def perfect_day(frequency=None):
     print('Forget everything you just typed. Now,...\n')
     question = 'What does your perfect day look like?'
+    if frequency: 
+        question = add_frequency_to_question(question, frequency)
     answer = answer_question(question, 'list', ordered=True)
     file_name = 'perfect_day'
     export_to_csv(file_name, answer, question)
@@ -322,8 +322,10 @@ def type_of_person():
 
 def wins(frequency=None):
     question = 'What are your wins?'
-    wins = answer_question(question, 'list', orderd=True)
-    print(f'\nTotal Wins: {len(wins)}\n')
+    if frequency: 
+        question = add_frequency_to_question(question, frequency)
+    wins = answer_question(question, 'list', ordered=True)
+    print(f'Total Wins: {len(wins)}\n')
     export_to_csv('Wins', wins, 'Wins')
     return wins
 

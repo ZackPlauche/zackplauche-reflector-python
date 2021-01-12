@@ -1,9 +1,16 @@
 import csv
 import re
+from datetime import datetime
 from pathlib import Path
 
 from config import settings
-from .utils import get_datetime_now_vars
+
+
+def get_datetime_now_vars():
+    date = datetime.now().strftime('%#m/%#d/%Y')
+    day = datetime.now().strftime('%A')
+    time = datetime.now().strftime('%I:%H %p').lstrip('0').lower()
+    return date, day, time
 
 
 def clean_data_for_export(*args):
@@ -21,9 +28,9 @@ def create_file_path(file_name, suffix):
     return file_path
 
 
-def create_file_path_and_mode(file_name, suffix):
+def create_file_path_and_mode(file_name, suffix, overwrite):
     file = create_file_path(file_name, suffix)
-    file_mode = determine_file_mode(file)
+    file_mode = determine_file_mode(file, overwrite)
     return file, file_mode
 
 
@@ -36,6 +43,7 @@ def add_time_headers_to_header_row(column_list):
 def add_time_data_to_data_row(data_list):
     time_data_list = list(get_datetime_now_vars())
     data_list = time_data_list + data_list
+    # TODO: Fix issue causing single list answers to be spread out with time data somewhere here (Check Wins.csv)
     return data_list
 
 
@@ -104,6 +112,7 @@ def write_data_in_text_list_format(answer_data, open_txt_file):
             open_txt_file.write(f'{list_index}. {item}\n')
             list_index += 1
 
+
 def export_to_txt(file_name, answer_data, overwrite=False):
     answer_data = clean_data_for_export(answer_data)
     file, file_mode = create_file_path_and_mode(file_name, '.txt', overwrite)
@@ -111,6 +120,7 @@ def export_to_txt(file_name, answer_data, overwrite=False):
         if file.mode == 'w+':
             write_txt_file_title(file_name, file)
         write_data_in_text_list_format(answer_data, file)
+
 
 def export(export_to, file_name, answer_data, column_or_question_list, overwrite=False):
     # column_or_question_list made mandatory because export_to_csv requires one

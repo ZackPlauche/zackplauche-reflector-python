@@ -1,4 +1,4 @@
-from reflector.reflector import run_reflector
+from reflector import run_reflector
 from reflector import activities
 
 activity_dict = {
@@ -11,6 +11,7 @@ activity_dict = {
     'Physiology Check': activities.physiology_check,
     'Operation SELF': activities.operation_self,
     'Operation Red Dragon': activities.operation_red_dragon,
+    'Wins': activities.wins,
 }
 
 
