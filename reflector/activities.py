@@ -5,7 +5,7 @@ import itertools
 from .utils import get_integrity_status
 from .answer import answer_question, answer_questions, answer_question_dict
 from .export import export_to_csv, export_to_txt
-
+from .activity import activity
 
 def acclaim_system():
     '''
@@ -60,7 +60,6 @@ def acclaim_system():
         'Self-Actualization',
     ]
 
-    # TODO: Make this a loop
     print('Physiology:\n'.upper())
     psychology_answers = answer_questions(physiology_questions, 'inline', yesno=True)
     print('Security:\n'.upper())
@@ -83,7 +82,7 @@ def acclaim_system():
     answers = list(itertools.chain.from_iterable(acclaim_system_answers))
     questions = list(itertools.chain.from_iterable(acclaim_system_questions))
 
-    export_to_csv(answers, questions, 'acclaim_system')
+    export_to_csv('acclaim_system', answers, questions)
 
 
 def delegation(frequency=None):
@@ -110,7 +109,7 @@ def easier_life():
     question = 'Name an idea to make your life easeir'
     easier_life_ideas = answer_question(question, 'list', cap=5)
     print()
-    export_to_txt(easier_life_ideas, 'Easier Life')
+    export_to_txt('Easier Life', easier_life_ideas)
     return easier_life_ideas
 
 
@@ -118,43 +117,50 @@ def goals():
     '''Displays a previous list of goals, and either ads or sets new ones.'''
     # TODO: Build goal reflector functionality
     question = 'What are your goals?'
-    file_name = 'My Goals.txt'
+    file_name = 'My Goals'
     goals = answer_question(question, 'list')
-    export_to_csv(goals, question, file_name)
+    export_to_csv(file_name, goals, question)
     return goals
 
 
 def gratitude():
     '''This function takes in a list of things you appreciate.'''
     question = 'What are you grateful for?'
-    gratitude_list = answer_question(question, 'list', ordered=True)
+    gratitude_list = answer_question(question, 'list', ordered=True, input_suffix='I\'m grateful for ')
     file_name = 'Gratitude List'
-    export_to_txt(gratitude_list, file_name)
+    export_to_txt(file_name, gratitude_list)
     print()
 
     return gratitude_list
+
+def self_love():
+    question = 'State 10 reasons why you love yourself'
+    answer = answer_question(question, 'list', ordered=True, cap='auto')
+    column_header = '10 Reasons I Love Myself'
+    export_to_csv('Self Love', answer, column_header)
+    return answer
 
 
 def improvements():
     question = ['What can you do to improve?']
     improvements = answer_question(question, 'list')
-    export_to_txt(improvements, 'Improvements')
+    export_to_txt('Improvements', improvements)
     return improvements
 
 
 def intentions():
     question = 'What are your intentions for the day?'
-    intentions = answer_question("What are your intentions for the day?", 'list')
+    intentions = answer_question(question, 'list', input_suffix='My intention is to')
     file_name = 'Intentions'
-    export_to_csv(intentions, question, file_name)
+    export_to_csv(file_name, intentions, question)
     return intentions
 
 
 def lessons():
     question = 'What lessons did you learn or relearn today?'
-    lessons = answer_question(question, "list")
+    lessons = answer_question(question, 'list')
     file_name = 'Daily Lessons'
-    export_to_csv(lessons, question, file_name)
+    export_to_csv(file_name, lessons, question)
 
     return lessons
 
@@ -162,7 +168,7 @@ def lessons():
 def meaningful_experience():
     question = 'What was one meaningful experience you had today?'
     meaningful_experience = answer_question(question, 'text')
-    export_to_csv(meaningful_experience, question, 'Meaningful Experiences')
+    export_to_csv('Meaningful Experiences', meaningful_experience, question)
     return meaningful_experience
 
 
@@ -177,6 +183,7 @@ def operation_self():
         "What can you do to turn this around?": {'answer_type': 'list'}
     }
     answers = answer_question_dict(questions_dict)
+    export_to_csv('Operation Self', answers, questions_dict)
 
 
 def operation_red_dragon():
@@ -199,13 +206,14 @@ def perfect_day(frequency):
     question = 'What does your perfect day look like?'
     answer = answer_question(question, 'list', ordered=True)
     file_name = 'perfect_day'
-    export_to_csv(answer, question, file_name)
+    export_to_csv(file_name, answer, question)
     return perfect_day
 
 
 def reflect():
     question = 'Take a minute to write a written reflection.'
     reflection = answer_question(question, 'text')
+    export_to_csv('Refections', reflection, 'Reflection')
     return reflection
 
 
@@ -220,7 +228,7 @@ def physiology_check():
         'Is your environment clean and organized?',
         'Do you feel complete wellness?'
     ]
-    answers = answer_question(questions, 'inline', yesno=True)
+    answers = answer_questions(questions, 'inline', yesno=True)
     score = get_integrity_status(questions, answers)
     print(f'\nYour physiology is at {get_integrity_status(questions, answers)}.\n')
     column_names = [
@@ -235,7 +243,7 @@ def physiology_check():
     ]
     answers = [score] + answers
     file_name = 'Health Stats'
-    export_to_csv(answers, column_names, file_name)
+    export_to_csv(file_name, answers, column_names)
     return answers
 
 
@@ -244,12 +252,11 @@ def priorities(frequency=None, write_checklist=False):
         'What are your top 3 personal priorities (starting with The ONE Thing)?',
         'What are your top 3 professional priorities (starting with The ONE Thing)?'
     ]
-    personal_priorities, work_priorities = answer_questions(questions, 'list', ordered=True, cap='auto')
+    priorities = answer_questions(questions, 'list', ordered=True, cap='auto')
+    personal_priorities, work_priorities = priorities
     column_names = ['ONE Thing', 'Priority #2', 'Priority #3']
-    file_name = 'Priorities'
-    export_to_csv(personal_priorities, column_names, 'Personal Priorities')
-    export_to_csv(work_priorities, column_names, 'Work Priorities')
-    priorities = [personal_priorities, work_priorities]
+    export_to_csv('Personal Priorities', personal_priorities, column_names)
+    export_to_csv('Work Priorities', work_priorities, column_names)
     return priorities
 
 
@@ -308,6 +315,7 @@ def ten_ideas(set_topic=False, frequency=None):
 def type_of_person():
     question = 'What type of person do you choose to be today?'
     type_of_person = answer_question(question, 'list')
+    export_to_csv('Type of Person', type_of_person, question)
     print()
     return type_of_person
 
@@ -316,4 +324,73 @@ def wins(frequency=None):
     question = 'What are your wins?'
     wins = answer_question(question, 'list', orderd=True)
     print(f'\nTotal Wins: {len(wins)}\n')
+    export_to_csv('Wins', wins, 'Wins')
     return wins
+
+
+# Main Activitiies
+
+def morning_reflection():
+    '''Reflection to get the day started in a positive, epic mindset.'''
+
+    print('Good morning handsome ;) \n')
+
+    reflect()
+    physiology_check()
+    goals()
+    type_of_person()
+    intentions()
+    gratitude()
+    priorities('daily')
+    self_love()
+    easier_life()
+    ten_ideas()
+    reflect()
+
+
+def end_of_day_reflection():
+
+    print('Good evening sir! :) \n')
+    reflect()
+    wins()
+    improvements()
+    lessons()
+    gratitude()
+    meaningful_experience()
+    self_love()
+    ten_ideas()
+    goals()
+    priorities(frequency='tomorrow')
+    reflect()
+
+
+def weekly_reflection():
+    print('I hope you had a nice week sir! :)\n')
+
+    reflect()
+    wins('weekly')
+    improvements()
+    priorities('weekly')
+    ten_ideas('crush it this week.')
+    perfect_day('weekly')
+    reflect()
+
+
+def monthly_reflection():
+    print('Wow, a whole month. I hope you had a nice month sir! :)\n')
+
+    reflect()
+    wins('monthly')
+    improvements()
+    priorities('monthly')
+    ten_ideas('crush it this month.')
+    perfect_day('monthly')
+
+
+def birthday_reflection():
+    '''Reflection to be done on your birthday.'''
+    print('Happy birthday! :)\n')
+    wins('yearly')
+    improvements()
+    priorities('yearly')
+    ten_ideas('make this year your most amazing year so far.')

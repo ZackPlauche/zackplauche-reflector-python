@@ -1,11 +1,9 @@
 import csv
 import re
-from datetime import datetime
 from pathlib import Path
-import os
 
-from . import settings
-from .utils import get_datetime_now_vars, debug
+from config import settings
+from .utils import get_datetime_now_vars
 
 
 def clean_data_for_export(*args):
@@ -23,7 +21,7 @@ def create_file_path(file_name, suffix):
     return file_path
 
 
-def create_file(file_name, suffix, overwrite=False):
+def create_file_path_and_mode(file_name, suffix):
     file = create_file_path(file_name, suffix)
     file_mode = determine_file_mode(file)
     return file, file_mode
@@ -57,15 +55,15 @@ def write_rows_to_csv(file, file_mode, rows):
         writer.writerows(rows)
 
 
-def export_to_csv(answer_data, column_header_list, file_name, overwrite=False):
+def export_to_csv(file_name, answer_data, column_header_list, overwrite=False):
     answer_data, column_header_list = clean_data_for_export(answer_data, column_header_list)
-    file, file_mode = create_file(file_name, '.csv', overwrite)
+    file, file_mode = create_file_path_and_mode(file_name, '.csv', overwrite)
     rows = create_csv_rows(answer_data, column_header_list, file_mode)
     write_rows_to_csv(file, file_mode, rows)
 
 
 def write_txt_file_title(file_name, open_txt_file):
-    file_title = print(f'{file_name}:\n\n')
+    file_title = f'{file_name}:\n\n'
     open_txt_file.write(file_title)
 
 
@@ -80,6 +78,7 @@ def get_list_index(open_txt_file):
     except:
         list_index = 1
     return list_index
+
 
 def write_data_in_q_and_a_format(answer_data, question_list, open_txt_file):
     for answer, question in zip(answer_data, question_list):
@@ -96,6 +95,7 @@ def add_todays_date(open_txt_file):
     except:
         open_txt_file.write(f'\n{date}\n')
 
+
 def write_data_in_text_list_format(answer_data, open_txt_file):
     add_todays_date(open_txt_file)
     list_index = get_list_index(open_txt_file)
@@ -104,13 +104,9 @@ def write_data_in_text_list_format(answer_data, open_txt_file):
             open_txt_file.write(f'{list_index}. {item}\n')
             list_index += 1
 
-# export_to_txt argument mapping doesn't match export_to_csv, but
-# question_list is optional because the intention was to have a Q&A style
-# test file option. This is the best I knew how to do for now (even though its
-# a bit mess)
-def export_to_txt(answer_data, file_name, question_list=None,  overwrite=False):
+def export_to_txt(file_name, answer_data, question_list=None,  overwrite=False):
     answer_data = clean_data_for_export(answer_data)
-    file, file_mode = create_file(file_name, '.txt', overwrite)
+    file, file_mode = create_file_path_and_mode(file_name, '.txt', overwrite)
     with open(file, file_mode) as file:
         if file.mode == 'w+':
             write_txt_file_title(file_name, file)
@@ -118,3 +114,9 @@ def export_to_txt(answer_data, file_name, question_list=None,  overwrite=False):
             write_data_in_q_and_a_format(answer_data, question_list, file)
         else:
             write_data_in_text_list_format(answer_data, file)
+
+def export(export_mode, answer_data, file_name, column_header_list, overwrite=False):
+    if export_mode in {'csv', '.csv'}:
+        export_to_csv(answer_data, file_name, column_header_list, overwrite)
+    elif export_mode in {'txt', '.txt'}:
+        export_to_txt(answer_data, file_name, overwrite)

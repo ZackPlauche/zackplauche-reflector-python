@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from datetime import datetime
 
 
@@ -8,7 +7,7 @@ def casefold_all(*vars) -> tuple:
         if type(var) is str:
             casefolded_vars_list.append(var.casefold())
         elif type(var) in {list, tuple, set}:
-            casefolded_vars_list.append(map(str.casefold, var))
+            casefolded_vars_list.append(list(map(str.casefold, var)))
     return tuple(casefolded_vars_list)
 
 
@@ -20,15 +19,10 @@ def get_datetime_now_vars():
 
 
 def get_integrity_status(yesno_question_list, yesno_answer_list):
-    '''
-    Takes in a list of yes or no answers and their resopnses and converts them to a total percentage value
-    based on a y to n ratio.
-    '''
     integrity_slice = 100 / len(yesno_question_list)
     integrity = sum([integrity_slice for answer in yesno_answer_list if answer in {'y', 'yes'}]).__int__()
     integrity_status = f'{integrity}%'
     return integrity_status
-
 
 
 def debug(*args):
