@@ -104,19 +104,18 @@ def write_data_in_text_list_format(answer_data, open_txt_file):
             open_txt_file.write(f'{list_index}. {item}\n')
             list_index += 1
 
-def export_to_txt(file_name, answer_data, question_list=None,  overwrite=False):
+def export_to_txt(file_name, answer_data, overwrite=False):
     answer_data = clean_data_for_export(answer_data)
     file, file_mode = create_file_path_and_mode(file_name, '.txt', overwrite)
     with open(file, file_mode) as file:
         if file.mode == 'w+':
             write_txt_file_title(file_name, file)
-        if question_list:
-            write_data_in_q_and_a_format(answer_data, question_list, file)
-        else:
-            write_data_in_text_list_format(answer_data, file)
+        write_data_in_text_list_format(answer_data, file)
 
 def export(export_to, file_name, answer_data, column_or_question_list, overwrite=False):
+    # column_or_question_list made mandatory because export_to_csv requires one
+    # on or the other.
     if export_to in {'csv', '.csv'}:
         export_to_csv(answer_data, file_name, column_or_question_list, overwrite)
     elif export_to in {'txt', '.txt'}:
-        export_to_txt(answer_data, file_name, column_or_question_list, overwrite)
+        export_to_txt(answer_data, file_name, overwrite)

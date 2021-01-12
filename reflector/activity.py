@@ -93,8 +93,6 @@ def remove_items_from_txt_file_list(file):
     export_to_txt(list_items, file.name, overwrite=True)
 
 
-
-
 def edit_txt_file_list(file_name, topic_plural, question):
     file = settings.STORAGE_DIRECTORY / file_name
     print_file_text(file)
