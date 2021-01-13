@@ -2,9 +2,35 @@ import time
 import os
 from .answer import answer_question
 
+
+def run_reflector(activity_dict):
+    print_reflector_intro()
+    while True:
+        activity = select_activity(activity_dict)
+        run_activity(activity)
+        if not play_again():
+            break
+
+
 def print_reflector_intro():
     print('\nWelcome to Reflector!')
     print('\nPlease choose an activity.\n')
+
+
+def select_activity(activity_dict):
+    activity_choice = smart_choice(list(activity_dict.keys()))
+    activity = activity_dict[activity_choice]
+    return activity
+
+
+def smart_choice(choice_list):
+    print_choice_list(choice_list)
+    while True:
+        choice_number = input(f'\nActivity number {get_choice_range(choice_list)}: ')
+        if validate_choice_number(choice_number, choice_list):
+            choice_number = int(choice_number) - 1
+            choice = choice_list[choice_number]
+            return choice
 
 
 def print_choice_list(choice_list):
@@ -16,14 +42,6 @@ def print_choice_list(choice_list):
 def get_choice_range(choice_list):
     choice_range = f'(from 1 to {len(choice_list)})'
     return choice_range
-
-
-def check_if_int(string):
-    try:
-        int(string)
-        return True
-    except ValueError:
-        return False
 
 
 def validate_choice_number(choice_number, choice_list):
@@ -47,20 +65,12 @@ def validate_choice_number(choice_number, choice_list):
     return choice_is_valid
 
 
-def smart_choice(choice_list):
-    print_choice_list(choice_list)
-    while True:
-        choice_number = input(f'\nActivity number {get_choice_range(choice_list)}: ')
-        if validate_choice_number(choice_number, choice_list):
-            choice_number = int(choice_number) - 1
-            choice = choice_list[choice_number]
-            return choice
-
-
-def select_activity(activity_dict):
-    activity_choice = smart_choice(list(activity_dict.keys()))
-    activity = activity_dict[activity_choice]
-    return activity
+def check_if_int(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
 
 
 def reflection_timer(func):
@@ -83,12 +93,3 @@ def play_again():
     question = '\n Would you like to do something else?'
     answer = answer_question(question, 'inline', yesno=True)
     return True if answer in {'y', 'yes', ''} else False
-
-
-def run_reflector(activity_dict):
-    print_reflector_intro()
-    while True:
-        activity = select_activity(activity_dict)
-        run_activity(activity)
-        if not play_again():
-            break

@@ -5,6 +5,73 @@ from reflector.export import export_to_csv, export_to_txt
 from reflector.activity import activity
 from .utils import get_integrity_status, add_frequency_to_question
 
+
+def morning_reflection():
+    '''Reflection to get the day started in a positive, epic mindset.'''
+
+    print('Good morning handsome ;) \n')
+
+    reflect()
+    physiology_check()
+    goals()
+    type_of_person()
+    intentions()
+    gratitude()
+    priorities('daily')
+    self_love()
+    easier_life()
+    ten_ideas()
+    reflect()
+
+
+def end_of_day_reflection():
+
+    print('Good evening sir! :) \n')
+    reflect()
+    wins()
+    improvements()
+    lessons()
+    gratitude()
+    meaningful_experience()
+    self_love()
+    ten_ideas()
+    goals()
+    priorities(frequency='tomorrow')
+    reflect()
+
+
+def weekly_reflection():
+    print('I hope you had a nice week sir! :)\n')
+
+    reflect()
+    wins('weekly')
+    improvements()
+    priorities('weekly')
+    ten_ideas('crush it this week.')
+    perfect_day('weekly')
+    reflect()
+
+
+def monthly_reflection():
+    print('Wow, a whole month. I hope you had a nice month sir! :)\n')
+
+    reflect()
+    wins('monthly')
+    improvements()
+    priorities('monthly')
+    ten_ideas('crush it this month.')
+    perfect_day('monthly')
+
+
+def birthday_reflection():
+    '''Reflection to be done on your birthday.'''
+    print('Happy birthday! :)\n')
+    wins('yearly')
+    improvements()
+    priorities('yearly')
+    ten_ideas('make this year your most amazing year so far.')
+
+
 def acclaim_system():
     '''
     Walks through the acclaim System Created by Ryan Donaldson, with some added parts.
@@ -131,6 +198,7 @@ def gratitude():
 
     return gratitude_list
 
+
 def self_love():
     question = 'State 10 reasons why you love yourself'
     answer = answer_question(question, 'list', ordered=True, cap='auto')
@@ -202,7 +270,7 @@ def operation_red_dragon():
 def perfect_day(frequency=None):
     print('Forget everything you just typed. Now,...\n')
     question = 'What does your perfect day look like?'
-    if frequency: 
+    if frequency:
         question = add_frequency_to_question(question, frequency)
     answer = answer_question(question, 'list', ordered=True)
     file_name = 'perfect_day'
@@ -322,77 +390,9 @@ def type_of_person():
 
 def wins(frequency=None):
     question = 'What are your wins?'
-    if frequency: 
+    if frequency:
         question = add_frequency_to_question(question, frequency)
     wins = answer_question(question, 'list', ordered=True)
     print(f'Total Wins: {len(wins)}\n')
     export_to_csv('Wins', wins, 'Wins')
     return wins
-
-
-# Main Activitiies
-
-def morning_reflection():
-    '''Reflection to get the day started in a positive, epic mindset.'''
-
-    print('Good morning handsome ;) \n')
-
-    reflect()
-    physiology_check()
-    goals()
-    type_of_person()
-    intentions()
-    gratitude()
-    priorities('daily')
-    self_love()
-    easier_life()
-    ten_ideas()
-    reflect()
-
-
-def end_of_day_reflection():
-
-    print('Good evening sir! :) \n')
-    reflect()
-    wins()
-    improvements()
-    lessons()
-    gratitude()
-    meaningful_experience()
-    self_love()
-    ten_ideas()
-    goals()
-    priorities(frequency='tomorrow')
-    reflect()
-
-
-def weekly_reflection():
-    print('I hope you had a nice week sir! :)\n')
-
-    reflect()
-    wins('weekly')
-    improvements()
-    priorities('weekly')
-    ten_ideas('crush it this week.')
-    perfect_day('weekly')
-    reflect()
-
-
-def monthly_reflection():
-    print('Wow, a whole month. I hope you had a nice month sir! :)\n')
-
-    reflect()
-    wins('monthly')
-    improvements()
-    priorities('monthly')
-    ten_ideas('crush it this month.')
-    perfect_day('monthly')
-
-
-def birthday_reflection():
-    '''Reflection to be done on your birthday.'''
-    print('Happy birthday! :)\n')
-    wins('yearly')
-    improvements()
-    priorities('yearly')
-    ten_ideas('make this year your most amazing year so far.')
