@@ -207,13 +207,3 @@ def validate_list_answer_cap(cap):
 def determine_linebreak(answer_type):
     if answer_type in {'text', 'list'}:
         print()
-
-
-
-
-
-
-
-
-
-
