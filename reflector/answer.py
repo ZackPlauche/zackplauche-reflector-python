@@ -1,6 +1,10 @@
 import re
 
-from config import settings
+__all__ = [
+    'answer_questions_dict',
+    'answer_questions',
+    'answer_question',
+]
 
 
 def answer_questions_dict(questions_dict):
