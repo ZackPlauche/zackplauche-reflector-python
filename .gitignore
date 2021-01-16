@@ -5,3 +5,5 @@ __pycache__
 openpyxl_training.py
 Pipfile
 venv
+.vscode
+data
