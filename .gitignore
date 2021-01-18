@@ -4,6 +4,7 @@ Data Storage
 __pycache__
 openpyxl_training.py
 Pipfile
+Pipefile.lock
 venv
 .vscode
 data
