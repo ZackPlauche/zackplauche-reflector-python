@@ -156,10 +156,10 @@ def love_and_belonging(file_name='Love & Belonging'):
 
 def self_esteem(file_name='Self Esteem'):
     questions = [
-        'State 10 reasons why you love yourself.',
-        'List 5 things you feel you are most competent at.',
+        'What are 10 reasons you love yourself?',
+        'What 5 things do you feel most competent at today?',
     ]
-    answers = answer_questions(questions, 'list', cap='auto')
+    answers = answer_questions(questions, 'list', ordered=True, cap='auto')
     column_names = ['Self Love Reasons', '5 Daily Competencies']
     export_to_csv(file_name, answers, column_names)
     return answers, column_names
@@ -167,10 +167,10 @@ def self_esteem(file_name='Self Esteem'):
 
 def self_actualization(file_name='Self Actualization'):
     questions = {
-        'List the 1 project that you\'re Most Excited to work on': {'answer_type': 'list', 'cap': 'auto'},
-        'List what skills that you\'re going to use from the self esteem list': {'answer_type': 'list'},
-        'List the actions that can be done to secure the success of that project': {'answer_type': 'list', 'ordered': True},
-        'List the criteria that will guage the success of that project.': {'answer_type': 'list'},
+        'What 1 project are you most excited to work on?': {'answer_type': 'inline', 'linebreak': True},
+        'What skills are you going to use from the self esteem list?': {'answer_type': 'list'},
+        'What actions (in order) can be done to secure the success of that project?': {'answer_type': 'list', 'ordered': True},
+        'What criteria will gauge the success of that project?': {'answer_type': 'list'},
         'Did you express completion of this board to your accountability partners?': {'answer_type': 'inline', 'yesno': True}
     }
     answers = answer_questions_dict(questions)
@@ -186,8 +186,6 @@ def self_actualization(file_name='Self Actualization'):
 
 
 def delegation(frequency=None):
-    '''Walks through process for where energy was spent and what can be done to become more efficient.'''
-
     quesitons = [
         'What took your energy?',
         'What non-ceo activities did you do?',
@@ -195,13 +193,14 @@ def delegation(frequency=None):
         'What systems do we need?',
         'What can I stop doing?'
     ]
-
-    columns = ['Energy Investments', 'Non CEO activities',
-               'Tasks to Delegate', 'Systems Needed', 'Stop List']
-
-    delegation_report = activity(
-        'Delegation Report', quesitons, frequency=frequency, export='report', columns=columns)
-
+    columns = [
+        'Energy Investments',
+        'Non CEO activities',
+        'Tasks to Delegate',
+        'Systems Needed',
+        'Stop List'
+    ]
+    delegation_report = activity('Delegation Report', quesitons, frequency=frequency, export='report', columns=columns)
     return delegation_report
 
 
@@ -209,7 +208,7 @@ def easier_life():
     question = 'Name an idea to make your life easeir'
     easier_life_ideas = answer_question(question, 'list', cap=5)
     print()
-    export_to_txt('Easier Life', easier_life_ideas)
+    export_to_csv('Easier Life', easier_life_ideas)
     return easier_life_ideas
 
 
@@ -223,13 +222,10 @@ def goals():
 
 
 def gratitude():
-    '''This function takes in a list of things you appreciate.'''
     file_name = 'Gratitude List'
     question = 'What are you grateful for?'
     gratitude_list = answer_question(question, 'list', ordered=True, input_suffix='I\'m grateful for ')
     export_to_csv(file_name, gratitude_list, column_headers='What are you grateful for?')
-    print()
-
     return gratitude_list
 
 
@@ -237,8 +233,8 @@ def self_love():
     file_name = 'Self Love'
     question = 'What are 10 Reasons you love yourself?'
     answer = answer_question(question, 'list', ordered=True, cap='auto', input_suffix="I love myself because ")
-    column_header = '10 Reasons I Love Myself'
-    export_to_csv(file_name, answer, column_header)
+    column_name = '10 Reasons I Love Myself'
+    export_to_csv(file_name, answer, column_name)
     return answer
 
 

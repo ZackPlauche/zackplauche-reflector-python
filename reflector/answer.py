@@ -182,7 +182,7 @@ def answer_as_list(input_prefix, ordered=False, cap=None, input_suffix=''):
 def create_list_answer_prefix(input_prefix, iteration, ordered, cap, input_suffix):
     cap_suffix = create_cap_suffix(iteration, cap)
     if ordered:
-        answer_prefix = f'{cap_suffix}. ' if cap else f'{iteration}. '
+        answer_prefix = f'{iteration}. '
     elif cap:
         answer_prefix = f'{input_prefix} ({cap_suffix}): '
     else:
