@@ -25,24 +25,30 @@ def create_question_index_suffix(question, question_list):
 
 
 def answer_question(question, answer_type, **kwargs):
-    answer = ''  # Just to temporarily resolve answer unbound error until I find better solution
     if answer_type == 'inline':
         answer = answer_question_as_inline(question, **kwargs)
     elif answer_type == 'text':
         answer = answer_question_as_text(question)
     elif answer_type == 'list':
         answer = answer_question_as_list(question, '• ', **kwargs)
+    else:
+        raise ValueError("Answer type must be inline, text, or list.")
     determine_linebreak(answer_type)
     return answer
 
 
-def answer_question_as_inline(question, yesno=False, choice_list=None, display_choice_list=None, spacer='/'):
+def determine_linebreak(answer_type):
+    if answer_type in {'text', 'list'}:
+        print()
+
+
+def answer_question_as_inline(question, yesno=False, choice_list=None, display_choice_list=None, spacer='/', linebreak=False):
     if yesno:
-        answer = answer_as_yesno(question)
+        answer = answer_as_yesno(question, linebreak)
     elif choice_list:
-        answer = answer_as_inline_choice(question, choice_list, display_choice_list, spacer)
+        answer = answer_as_inline_choice(question, choice_list, display_choice_list, spacer, linebreak)
     else:
-        answer = answer_as_inline(question)
+        answer = answer_as_inline(question, linebreak)
     return answer
 
 
@@ -169,6 +175,8 @@ def answer_as_list(input_prefix, ordered=False, cap=None, input_suffix=''):
         if not answer:
             break
         answer_list.append(answer)
+    if answer_list:
+        answer_list = [convert_list_to_csv_ul_string(answer_list)]
     return answer_list
 
 
@@ -204,6 +212,7 @@ def validate_list_answer_cap(cap):
         raise ValueError(help_text)
 
 
-def determine_linebreak(answer_type):
-    if answer_type in {'text', 'list'}:
-        print()
+def convert_list_to_csv_ul_string(list_):
+    list_[0] = f'• {list_[0]}'
+    list_ = '\n• '.join(list_)
+    return list_

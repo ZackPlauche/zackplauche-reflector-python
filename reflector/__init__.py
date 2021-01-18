@@ -78,10 +78,28 @@ def reflection_timer(func):
         start_time = time.time()
         func(arg)
         end_time = time.time()
-        total_time = end_time - start_time
-        print(f'Your reflection took {total_time // 60 } minutes.')
+        total_time = create_total_time_string(end_time - start_time)
+        print(f'Your reflection took {total_time}.')
         os.system('pause')
     return wrapper
+
+
+def create_total_time_string(seconds):
+    hours, minutes = convert_seconds_to_hours_minutes(seconds)
+    minute_suffix = 'minutes' if minutes != 1 else 'minute'
+    hour_suffix = 'hours' if hours != 1 else 'hour'
+    total_time = f'{minutes} {minute_suffix}'
+    if hours:
+        total_time = f'{hours} {hour_suffix} ' + total_time 
+    return total_time
+
+
+def convert_seconds_to_hours_minutes(seconds):
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    hours = int(hours)
+    minutes = int(minutes)
+    return hours, minutes
 
 
 @reflection_timer
@@ -90,6 +108,6 @@ def run_activity(activity):
 
 
 def play_again():
-    question = '\n Would you like to do something else?'
+    question = '\nWould you like to do something else?'
     answer = answer_question(question, 'inline', yesno=True)
     return True if answer in {'y', 'yes', ''} else False

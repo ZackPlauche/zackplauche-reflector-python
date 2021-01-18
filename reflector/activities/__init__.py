@@ -193,7 +193,7 @@ def gratitude():
     file_name = 'Gratitude List'
     question = 'What are you grateful for?'
     gratitude_list = answer_question(question, 'list', ordered=True, input_suffix='I\'m grateful for ')
-    export_to_txt(file_name, gratitude_list)
+    export_to_csv(file_name, gratitude_list, column_headers='What are you grateful for?')
     print()
 
     return gratitude_list
@@ -202,7 +202,7 @@ def gratitude():
 def self_love():
     file_name = 'Self Love'
     question = 'What are 10 Reasons you love yourself?'
-    answer = answer_question(question, 'list', ordered=True, cap='auto', answer_suffix="I love myself because ")
+    answer = answer_question(question, 'list', ordered=True, cap='auto', input_suffix="I love myself because ")
     column_header = '10 Reasons I Love Myself'
     export_to_csv(file_name, answer, column_header)
     return answer
@@ -216,9 +216,9 @@ def improvements():
 
 
 def intentions():
-    question = 'What are your intentions for the day?'
-    intentions = answer_question(question, 'list', input_suffix='My intention is to')
     file_name = 'Intentions'
+    question = 'What are your intentions for the day?'
+    intentions = answer_question(question, 'list', input_suffix='My intention is to ')
     export_to_csv(file_name, intentions, question)
     return intentions
 
@@ -241,11 +241,11 @@ def meaningful_experience():
 
 def operation_self():
     """This program is for when you're feeling low self esteem / fear that might be fucking up your life at the moment."""
-    print('\nThe SELF in this activity is an acronym, that stands for "Self Esteem Low / Fear"\nand was made to be a guide out of your temporary darkness and move you to a more empowered state.')
+    print('\nThe SELF in this activity is an acronym, that stands for "Self Esteem Low / Fear" and was made to be a guide out of your temporary darkness and move you to a more empowered state.')
 
     questions_dict = {
         "Did you poop today?": {'answer_type': 'inline', 'yesno': True},
-        "Did you tell your significant other that you're experiencing this?": {'answer_type': 'inline', 'yesno': True},
+        "Did you tell your significant other that you're experiencing this?": {'answer_type': 'inline', 'yesno': True, 'linebreak': True},
         "Go ahead and reflect for a minute to try to clear your brain.": {'answer_type': 'text'},
         "What can you do to turn this around?": {'answer_type': 'list'}
     }
@@ -288,6 +288,7 @@ def reflect():
 
 def physiology_check():
     '''Checks up on health stats for the day.'''
+    file_name = 'Health Stats'
     questions = [
         'Do you feel well rested?',
         'Are you hydrated?',
@@ -311,7 +312,6 @@ def physiology_check():
         'Full of Health'
     ]
     answers = [score] + answers
-    file_name = 'Health Stats'
     export_to_csv(file_name, answers, column_names)
     return answers
 
@@ -381,11 +381,10 @@ def check_for_topic():
     return topic
 
 
-def type_of_person():
-    question = 'What type of person do you choose to be today?'
-    type_of_person = answer_question(question, 'list')
+def type_of_person(pronoun='person'):
+    question = f'What type of {pronoun} do you choose to be today?'
+    type_of_person = answer_question(question, 'list', input_suffix=f'I choose to be the type of {pronoun} who ')
     export_to_csv('Type of Person', type_of_person, question)
-    print()
     return type_of_person
 
 
