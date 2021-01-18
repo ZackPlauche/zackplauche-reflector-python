@@ -127,10 +127,13 @@ def acclaim_system():
 
     print('Physiology:\n'.upper())
     psychology_answers = answer_questions(physiology_questions, 'inline', yesno=True)
+    print()
     print('Security:\n'.upper())
     security_answers = answer_questions(security_questions, 'inline', yesno=True)
+    print()
     print('Love & Belonging:\n'.upper())
     love_and_belonging_answers = answer_questions(love_and_belonging_questions, 'inline', yesno=True)
+    print()
     print('Self-Esteem:\n'.upper())
     self_esteem_answers = answer_questions(self_esteem_questions, 'list', cap='auto')
     print('Self Actualtization:\n'.upper())

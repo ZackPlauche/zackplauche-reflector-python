@@ -9,8 +9,6 @@ activity_dict = {
     'Acclaim System': activities.acclaim_system,
     'Prismatic System': activities.prismatic_system,
     'Physiology Check': activities.physiology_check,
-    'Operation SELF': activities.operation_self,
-    'Operation Red Dragon': activities.operation_red_dragon,
     'Wins': activities.wins,
 }
 
