@@ -199,10 +199,10 @@ def create_cap_suffix(iteration, cap):
 
 
 def get_cap_in_answer_prefix(answer_prefix):
-    pattern = "\d+"  # TODO: Make Regex ignore inside of parenthesis "(...)"
+    pattern = "\(.+\)|(\d+)"
     regex = re.compile(pattern)
-    match = regex.search(answer_prefix)
-    answer_cap = int(match.group()) if match else None
+    match = regex.search(answer_prefix).group(1)
+    answer_cap = int(match) if match else None
     return answer_cap
 
 
