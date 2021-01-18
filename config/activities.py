@@ -92,6 +92,8 @@ def acclaim_system(file_name='Accliam System'):
     for category, function in zip(categories, functions):
         print(f'{category}:\n')
         answers, columns = function()
+        all_answers.append(answers)
+        all_columns.append(columns)
     answers = list(itertools.chain.from_iterable(all_answers))
     columns = list(itertools.chain.from_iterable(all_columns))
     export_to_csv(file_name, answers, columns)
@@ -243,7 +245,7 @@ def self_love():
 def improvements():
     question = 'What can you do to improve?'
     improvements = answer_question(question, 'list')
-    export_to_txt('Improvements', improvements)
+    export_to_csv('Improvements', improvements, question)
     return improvements
 
 
