@@ -46,15 +46,15 @@ def answer_question_as_inline(question, yesno=False, choice_list=None, display_c
     return answer
 
 
-def answer_as_yesno(question):
-    answer = answer_as_inline_choice(question, ['yes', 'y', 'no', 'n'], display_choice_list=['y', 'n'], spacer='/')
+def answer_as_yesno(question, linebreak=False):
+    answer = answer_as_inline_choice(question, ['yes', 'y', 'no', 'n'], ['y', 'n'], '/', linebreak)
     return answer
 
 
-def answer_as_inline_choice(question, choice_list, display_choice_list=None, spacer="/"):
+def answer_as_inline_choice(question, choice_list, display_choice_list=None, spacer="/", linebreak=False):
     validate_choice_lists(choice_list, display_choice_list)
     question += create_choice_help_text(choice_list, display_choice_list, spacer)
-    answer = answer_as_inline(question)
+    answer = answer_as_inline(question, linebreak)
     validate_choice(answer, choice_list)
     return answer
 
@@ -88,8 +88,10 @@ def create_choice_help_text(choice_list, display_choice_list, spacer):
     return choice_help_text
 
 
-def answer_as_inline(input_prefix):
+def answer_as_inline(input_prefix, linebreak=False):
     answer = input(f'{input_prefix}: ')
+    if linebreak:
+        print()
     return answer
 
 

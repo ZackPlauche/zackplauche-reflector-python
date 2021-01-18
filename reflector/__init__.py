@@ -77,7 +77,7 @@ def reflection_timer(func):
     def wrapper(arg):
         start_time = time.time()
         func(arg)
-        end_time = round(time.time())
+        end_time = time.time()
         total_time = end_time - start_time
         print(f'Your reflection took {total_time // 60 } minutes.')
         os.system('pause')

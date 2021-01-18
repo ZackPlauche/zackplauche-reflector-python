@@ -250,7 +250,7 @@ def operation_self():
         "What can you do to turn this around?": {'answer_type': 'list'}
     }
     answers = answer_questions_dict(questions_dict)
-    export_to_csv('Operation Self', answers, questions_dict)
+    export_to_csv('Operation Self', answers, list(questions_dict.keys()))
 
 
 def operation_red_dragon():
