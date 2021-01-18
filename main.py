@@ -1,5 +1,5 @@
 from reflector import run_reflector
-from reflector import activities
+from config import activities
 
 activity_dict = {
     'Morning Reflection': activities.morning_reflection,
@@ -8,9 +8,8 @@ activity_dict = {
     'Monthly Reflection': activities.monthly_reflection,
     'Acclaim System': activities.acclaim_system,
     'Prismatic System': activities.prismatic_system,
-    'Physiology Check': activities.physiology_check,
+    'Physiology Check': activities.physiology,
     'Wins': activities.wins,
+    'Self Actualization': activities.self_actualization
 }
-
-
 run_reflector(activity_dict)

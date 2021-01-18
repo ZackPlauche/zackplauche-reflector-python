@@ -175,8 +175,7 @@ def answer_as_list(input_prefix, ordered=False, cap=None, input_suffix=''):
         if not answer:
             break
         answer_list.append(answer)
-    if answer_list:
-        answer_list = [convert_list_to_csv_ul_string(answer_list)]
+    answer_list = convert_list_to_csv_ul_string(answer_list)
     return answer_list
 
 
@@ -213,6 +212,7 @@ def validate_list_answer_cap(cap):
 
 
 def convert_list_to_csv_ul_string(list_):
-    list_[0] = f'• {list_[0]}'
+    if list_:
+        list_[0] = f'• {list_[0]}'
     list_ = '\n• '.join(list_)
     return list_

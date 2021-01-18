@@ -3,7 +3,7 @@ from .export import export_to_csv
 
 
 def activity(export_to, file_name, questions, column_list=None, **kwargs):
-    answer = ""
+    answer = ''
     if type(questions) is str:
         answer = answer_question(questions, **kwargs)
     elif type(questions) is list:

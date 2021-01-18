@@ -1,19 +1,22 @@
 import itertools
 
-from reflector.answer import answer_question, answer_questions, answer_questions_dict
-from reflector.export import export_to_csv, export_to_txt
+from reflector.answer import (
+    answer_question,
+    answer_questions,
+    answer_questions_dict
+)
+from reflector.export import export_to_csv
 from reflector.activity import activity
-from .utils import get_integrity_status, add_frequency_to_question
+from reflector.utils import (
+    get_and_print_integrity_status,
+    add_frequency_to_question
+)
 
 
 def morning_reflection():
-    '''Reflection to get the day started in a positive, epic mindset.'''
-
     print('Good morning handsome ;) \n')
-
     reflect()
-    physiology_check()
-    goals()
+    physiology()
     type_of_person()
     intentions()
     gratitude()
@@ -25,7 +28,6 @@ def morning_reflection():
 
 
 def end_of_day_reflection():
-
     print('Good evening sir! :) \n')
     reflect()
     wins()
@@ -42,7 +44,6 @@ def end_of_day_reflection():
 
 def weekly_reflection():
     print('I hope you had a nice week sir! :)\n')
-
     reflect()
     wins('weekly')
     improvements()
@@ -54,7 +55,6 @@ def weekly_reflection():
 
 def monthly_reflection():
     print('Wow, a whole month. I hope you had a nice month sir! :)\n')
-
     reflect()
     wins('monthly')
     improvements()
@@ -64,7 +64,6 @@ def monthly_reflection():
 
 
 def birthday_reflection():
-    '''Reflection to be done on your birthday.'''
     print('Happy birthday! :)\n')
     wins('yearly')
     improvements()
@@ -72,11 +71,34 @@ def birthday_reflection():
     ten_ideas('make this year your most amazing year so far.')
 
 
-def acclaim_system():
-    '''
-    Walks through the acclaim System Created by Ryan Donaldson, with some added parts.
-    '''
-    physiology_questions = [
+def acclaim_system(file_name='Accliam System'):
+    '''Walks through the acclaim System Created by Ryan Donaldson, with some added parts.'''
+    functions = [
+        physiology,
+        security,
+        love_and_belonging,
+        self_esteem,
+        self_actualization
+    ]
+    categories = [
+        'Physiology',
+        'Security',
+        'Love & Belonging',
+        'Self-Esteem',
+        'Self-Actualization',
+    ]
+    all_answers = []
+    all_columns = []
+    for category, function in zip(categories, functions):
+        print(f'{category}:\n')
+        answers, columns = function()
+    answers = list(itertools.chain.from_iterable(all_answers))
+    columns = list(itertools.chain.from_iterable(all_columns))
+    export_to_csv(file_name, answers, columns)
+
+
+def physiology(file_name='Physiology'):
+    questions = [
         'Do you feel well rested?',
         'Are you hydrated?',
         'Are you well fed?',
@@ -85,72 +107,80 @@ def acclaim_system():
         'Is your environment clean and organized?',
         'Do you feel complete wellness?'
     ]
+    answers = answer_questions(questions, 'inline', yesno=True)
+    score = get_and_print_integrity_status(questions, answers, 'phsiology')
+    column_names = [
+        'Physiology Score',
+        'Well Rested',
+        'Hydrated',
+        'Well Fed',
+        'Movement',
+        'Temperature',
+        'Clean Environment',
+        'Full of Health'
+    ]
+    answers = [score] + answers
+    export_to_csv(file_name, answers, column_names)
+    return answers, column_names
 
-    security_questions = [
+
+def security(file_name='Security'):
+    questions = [
         'Are you financially well off or have a financial plan?',
         'Are you physically safe?'
     ]
+    answers = answer_questions(questions, 'inline', yesno=True)
+    answers.insert(0, get_and_print_integrity_status(questions, answers, topic='security'))
+    column_names = ['Security Score', 'Financially Safe', 'Physically Safe']
+    export_to_csv(file_name, answers, column_names)
+    return answers, column_names
 
-    love_and_belonging_questions = [
+
+def love_and_belonging(file_name='Love & Belonging'):
+    questions = [
         'Have you messaged 5 of your friends saying "I appreciate you & you matter to me"?',
         'Have you talked to your favorite person or Significant Other?'
     ]
-
-    self_esteem_questions = [
-        'State 10 reasons why you love your',
-        'List 5 things you feel you are most competent at.'
+    answers = answer_questions(questions, 'inline', yesno=True)
+    answers.insert(0, get_and_print_integrity_status(questions, answers, 'love & belonging'))
+    column_names = [
+        'Love & Belonging Score', 
+        '5 Friends Appreciated', 
+        'SO / Favorite Person Talked To'
     ]
+    export_to_csv(file_name, answers, column_names)
+    return answers, column_names
 
-    self_actualization_questions_dict = {
+
+def self_esteem(file_name='Self Esteem'):
+    questions = [
+        'State 10 reasons why you love yourself.',
+        'List 5 things you feel you are most competent at.',
+    ]
+    answers = answer_questions(questions, 'list', cap='auto')
+    column_names = ['Self Love Reasons', '5 Daily Competencies']
+    export_to_csv(file_name, answers, column_names)
+    return answers, column_names
+
+
+def self_actualization(file_name='Self Actualization'):
+    questions = {
         'List the 1 project that you\'re Most Excited to work on': {'answer_type': 'list', 'cap': 'auto'},
         'List what skills that you\'re going to use from the self esteem list': {'answer_type': 'list'},
         'List the actions that can be done to secure the success of that project': {'answer_type': 'list', 'ordered': True},
         'List the criteria that will guage the success of that project.': {'answer_type': 'list'},
         'Did you express completion of this board to your accountability partners?': {'answer_type': 'inline', 'yesno': True}
     }
-
-    acclaim_system_questions = [
-        physiology_questions,
-        security_questions,
-        love_and_belonging_questions,
-        self_esteem_questions,
-        self_actualization_questions_dict.keys(),
+    answers = answer_questions_dict(questions)
+    column_names = [
+        'Project Your Most Excited For',
+        'Skills to Apply to Favorite Project',
+        'Actions for Project Success',
+        'Criteria for Project Success',
+        'Shared With Accountability Partners',
     ]
-
-    acclaim_system_status_list = [
-        'Physiology',
-        'Security',
-        'Love & Belonging',
-        'Self-Esteem',
-        'Self-Actualization',
-    ]
-
-    print('Physiology:\n'.upper())
-    physiology_answers = answer_questions(physiology_questions, 'inline', yesno=True)
-    print()
-    print('Security:\n'.upper())
-    security_answers = answer_questions(security_questions, 'inline', yesno=True)
-    print()
-    print('Love & Belonging:\n'.upper())
-    love_and_belonging_answers = answer_questions(love_and_belonging_questions, 'inline', yesno=True)
-    print()
-    print('Self-Esteem:\n'.upper())
-    self_esteem_answers = answer_questions(self_esteem_questions, 'list', cap='auto')
-    print('Self Actualtization:\n'.upper())
-    self_actualization_answers = answer_questions_dict(self_actualization_questions_dict)
-
-    acclaim_system_answers = [
-        physiology_answers,
-        security_answers,
-        love_and_belonging_answers,
-        self_esteem_answers,
-        self_actualization_answers
-    ]
-
-    answers = list(itertools.chain.from_iterable(acclaim_system_answers))
-    questions = list(itertools.chain.from_iterable(acclaim_system_questions))
-
-    export_to_csv('acclaim_system', answers, questions)
+    export_to_csv(file_name, answers, column_names)
+    return answers, column_names
 
 
 def delegation(frequency=None):
@@ -183,7 +213,6 @@ def easier_life():
 
 def goals():
     '''Displays a previous list of goals, and either ads or sets new ones.'''
-    # TODO: Build goal reflector functionality
     question = 'What are your goals?'
     file_name = 'My Goals'
     goals = answer_question(question, 'list')
@@ -288,36 +317,6 @@ def reflect():
     return reflection
 
 
-def physiology_check():
-    '''Checks up on health stats for the day.'''
-    file_name = 'Health Stats'
-    questions = [
-        'Do you feel well rested?',
-        'Are you hydrated?',
-        'Are you well fed?',
-        'Did you (or are you going to) exercise today?',
-        'Is the temperature fine for you?',
-        'Is your environment clean and organized?',
-        'Do you feel complete wellness?'
-    ]
-    answers = answer_questions(questions, 'inline', yesno=True)
-    score = get_integrity_status(questions, answers)
-    print(f'\nYour physiology is at {get_integrity_status(questions, answers)}.\n')
-    column_names = [
-        'Score',
-        'Well Rested',
-        'Hydrated',
-        'Well Fed',
-        'Movement',
-        'Temperature',
-        'Clean Environment',
-        'Full of Health'
-    ]
-    answers = [score] + answers
-    export_to_csv(file_name, answers, column_names)
-    return answers
-
-
 def priorities(frequency=None, write_checklist=False):
     questions = [
         'What are your top 3 personal priorities (starting with The ONE Thing)?',
@@ -362,9 +361,7 @@ def prismatic_system():
     return answers
 
 
-def ten_ideas(set_topic=False, frequency=None):
-
-    topic = check_for_topic() if set_topic else 'to improve your life'
+def ten_ideas(topic='improve your life', frequency=None):
     question = f'Name an idea to {topic}'
     answer = answer_question(question, 'list', cap=10)
     file_name = 'ideas'
@@ -372,15 +369,6 @@ def ten_ideas(set_topic=False, frequency=None):
         file_name = f'{frequency} {file_name}'.title()
     export_to_csv(file_name, answer, question)
     return answer
-
-
-def check_for_topic():
-    print('Anything specific you want to accomplish?\n\n')
-    topic = answer_question('I\'d like to', 'inline')
-    if not topic:
-        topic = 'improve your life'
-    print()
-    return topic
 
 
 def type_of_person(pronoun='person'):
