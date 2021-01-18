@@ -126,7 +126,7 @@ def acclaim_system():
     ]
 
     print('Physiology:\n'.upper())
-    psychology_answers = answer_questions(physiology_questions, 'inline', yesno=True)
+    physiology_answers = answer_questions(physiology_questions, 'inline', yesno=True)
     print()
     print('Security:\n'.upper())
     security_answers = answer_questions(security_questions, 'inline', yesno=True)
@@ -140,7 +140,7 @@ def acclaim_system():
     self_actualization_answers = answer_questions_dict(self_actualization_questions_dict)
 
     acclaim_system_answers = [
-        psychology_answers,
+        physiology_answers,
         security_answers,
         love_and_belonging_answers,
         self_esteem_answers,
