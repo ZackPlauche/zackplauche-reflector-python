@@ -228,7 +228,6 @@ def lessons():
     lessons = answer_question(question, 'list')
     file_name = 'Daily Lessons'
     export_to_csv(file_name, lessons, question)
-
     return lessons
 
 
