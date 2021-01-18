@@ -190,9 +190,9 @@ def goals():
 
 def gratitude():
     '''This function takes in a list of things you appreciate.'''
+    file_name = 'Gratitude List'
     question = 'What are you grateful for?'
     gratitude_list = answer_question(question, 'list', ordered=True, input_suffix='I\'m grateful for ')
-    file_name = 'Gratitude List'
     export_to_txt(file_name, gratitude_list)
     print()
 
@@ -200,10 +200,11 @@ def gratitude():
 
 
 def self_love():
-    question = 'State 10 reasons why you love yourself'
-    answer = answer_question(question, 'list', ordered=True, cap='auto')
+    file_name = 'Self Love'
+    question = 'What are 10 Reasons you love yourself?'
+    answer = answer_question(question, 'list', ordered=True, cap='auto', answer_suffix="I love myself because ")
     column_header = '10 Reasons I Love Myself'
-    export_to_csv('Self Love', answer, column_header)
+    export_to_csv(file_name, answer, column_header)
     return answer
 
 
@@ -359,15 +360,6 @@ def prismatic_system():
     return answers
 
 
-def check_for_topic():
-    print('Anything specific you want to accomplish?\n\n')
-    topic = answer_question('I\'d like to', 'inline')
-    if not topic:
-        topic = 'improve your life'
-    print()
-    return topic
-
-
 def ten_ideas(set_topic=False, frequency=None):
 
     topic = check_for_topic() if set_topic else 'to improve your life'
@@ -375,9 +367,18 @@ def ten_ideas(set_topic=False, frequency=None):
     answer = answer_question(question, 'list', cap=10)
     file_name = 'ideas'
     if frequency:
-        filename = f'{frequency} {file_name}'.title()
-    export_to_csv(answer, question, file_name)
+        file_name = f'{frequency} {file_name}'.title()
+    export_to_csv(file_name, answer, question)
     return answer
+
+
+def check_for_topic():
+    print('Anything specific you want to accomplish?\n\n')
+    topic = answer_question('I\'d like to', 'inline')
+    if not topic:
+        topic = 'improve your life'
+    print()
+    return topic
 
 
 def type_of_person():

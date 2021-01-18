@@ -184,7 +184,7 @@ def create_list_answer_prefix(input_prefix, iteration, ordered, cap, input_suffi
 
 
 def create_cap_suffix(iteration, cap):
-    cap_suffix = f'{iteration} in {cap}' if cap else None
+    cap_suffix = f'{iteration} of {cap}' if cap else None
     return cap_suffix
 
 
