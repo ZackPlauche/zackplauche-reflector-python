@@ -6,20 +6,12 @@ from pathlib import Path
 from config import settings
 
 
-def export(export_to, file_name, answer_data, column_or_question_list, overwrite=False):
-    # column_or_question_list made mandatory because export_to_csv requires one
-    # on or the other.
-    if export_to in {'csv', '.csv'}:
-        export_to_csv(answer_data, file_name, column_or_question_list, overwrite)
-    elif export_to in {'txt', '.txt'}:
-        export_to_txt(answer_data, file_name, overwrite)
-
-
-def export_to_csv(file_name, answer_data, column_header_list, overwrite=False):
-    answer_data, column_header_list = clean_data_for_export(answer_data, column_header_list)
-    file, file_mode = create_file_path_and_mode(file_name, '.csv', overwrite)
-    rows = create_csv_rows(answer_data, column_header_list, file_mode)
-    write_rows_to_csv(file, file_mode, rows)
+def export_to_csv(file_name, answer_data, column_headers: list, overwrite=False):
+    if answer_data:
+        answer_data, column_headers = clean_data_for_export(answer_data, column_headers)
+        file, file_mode = create_file_path_and_mode(file_name, '.csv', overwrite)
+        rows = create_csv_rows(answer_data, column_headers, file_mode)
+        write_rows_to_csv(file, file_mode, rows)
 
 
 def clean_data_for_export(*args):
@@ -62,7 +54,6 @@ def add_time_headers_to_header_row(column_list):
 def add_time_data_to_data_row(data_list):
     time_data_list = list(get_datetime_now_vars())
     data_list = time_data_list + data_list
-    # TODO: Fix issue causing single list answers to be spread out with time data somewhere here (Check Wins.csv)
     return data_list
 
 
@@ -74,7 +65,7 @@ def get_datetime_now_vars():
 
 
 def write_rows_to_csv(file, file_mode, rows):
-    with open(file, file_mode, newline='') as csv_file:
+    with open(file, file_mode, newline='', encoding='utf-8') as csv_file:
         writer = csv.writer(csv_file)
         writer.writerows(rows)
 
