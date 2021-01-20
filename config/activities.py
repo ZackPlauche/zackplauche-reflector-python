@@ -167,11 +167,11 @@ def self_esteem(file_name='Self Esteem'):
 
 def self_actualization(file_name='Self Actualization'):
     questions = {
-        'What 1 project are you most excited to work on?': {'answer_type': 'inline', 'linebreak': True},
-        'What skills are you going to use from the self esteem list?': {'answer_type': 'list'},
-        'What actions (in order) can be done to secure the success of that project?': {'answer_type': 'list', 'ordered': True},
-        'What criteria will gauge the success of that project?': {'answer_type': 'list'},
-        'Did you express completion of this board to your accountability partners?': {'answer_type': 'inline', 'yesno': True}
+        'What 1 project are you most excited to work on?': {'answer_format': 'inline', 'linebreak': True},
+        'What skills are you going to use from the self esteem list?': {'answer_format': 'list'},
+        'What actions (in order) can be done to secure the success of that project?': {'answer_format': 'list', 'ordered': True},
+        'What criteria will gauge the success of that project?': {'answer_format': 'list'},
+        'Did you express completion of this board to your accountability partners?': {'answer_format': 'inline', 'yesno': True}
     }
     answers = answer_questions_dict(questions)
     column_names = [
@@ -207,8 +207,8 @@ def delegation(frequency=None):
 def easier_life():
     question = 'Name an idea to make your life easeir'
     easier_life_ideas = answer_question(question, 'list', cap=5)
-    print()
-    export_to_csv('Easier Life', easier_life_ideas)
+    column_name = 'Easier Life Ideas'
+    export_to_csv('Easier Life', easier_life_ideas, column_name)
     return easier_life_ideas
 
 
@@ -248,7 +248,7 @@ def improvements():
 def intentions():
     file_name = 'Intentions'
     question = 'What are your intentions for the day?'
-    intentions = answer_question(question, 'list', input_suffix='My intention is to ')
+    intentions = answer_question(question, 'list', ordered=True)
     export_to_csv(file_name, intentions, question)
     return intentions
 
@@ -273,10 +273,10 @@ def operation_self():
     print('\nThe SELF in this activity is an acronym, that stands for "Self Esteem Low / Fear" and was made to be a guide out of your temporary darkness and move you to a more empowered state.')
 
     questions_dict = {
-        "Did you poop today?": {'answer_type': 'inline', 'yesno': True},
-        "Did you tell your significant other that you're experiencing this?": {'answer_type': 'inline', 'yesno': True, 'linebreak': True},
-        "Go ahead and reflect for a minute to try to clear your brain.": {'answer_type': 'text'},
-        "What can you do to turn this around?": {'answer_type': 'list'}
+        "Did you poop today?": {'answer_format': 'inline', 'yesno': True},
+        "Did you tell your significant other that you're experiencing this?": {'answer_format': 'inline', 'yesno': True, 'linebreak': True},
+        "Go ahead and reflect for a minute to try to clear your brain.": {'answer_format': 'text'},
+        "What can you do to turn this around?": {'answer_format': 'list'}
     }
     answers = answer_questions_dict(questions_dict)
     export_to_csv('Operation Self', answers, list(questions_dict.keys()))
@@ -331,16 +331,16 @@ def priorities(frequency=None, write_checklist=False):
 def prismatic_system():
     '''Walks user through Ryan Donaldson's PRISMATIC Goal Setting System.'''
     prismatic_questions_dict = {
-        'What is your goal?': {'answer_type': 'inline'},
-        'P: What People will you utilize to achieve your goal?': {'answer_type': 'list'},
-        'R: What Resources will you utilzie to achieve your goal?': {'answer_type': 'list'},
-        'I: What Identities will you embody to achieve your goal?': {'answer_type': 'list'},
-        'S: What are the Specifics of your goal?': {'answer_type': 'list'},
-        'M: What Metrics will you use to track progress towards goal?': {'answer_type': 'list'},
-        'A: What Actions will you take to achieve your goal?': {'answer_type': 'list', 'ordered': True},
-        'T: What are the Timelines for each action?': {'answer_type': 'list'},
-        'I: What Information will you utilize to achieve your goal?': {'answer_type': 'list'},
-        'C: What are your Criteria for Success to achieve this goal?': {'answer_type': 'list'},
+        'What is your goal?': {'answer_format': 'inline'},
+        'P: What People will you utilize to achieve your goal?': {'answer_format': 'list'},
+        'R: What Resources will you utilzie to achieve your goal?': {'answer_format': 'list'},
+        'I: What Identities will you embody to achieve your goal?': {'answer_format': 'list'},
+        'S: What are the Specifics of your goal?': {'answer_format': 'list'},
+        'M: What Metrics will you use to track progress towards goal?': {'answer_format': 'list'},
+        'A: What Actions will you take to achieve your goal?': {'answer_format': 'list', 'ordered': True},
+        'T: What are the Timelines for each action?': {'answer_format': 'list'},
+        'I: What Information will you utilize to achieve your goal?': {'answer_format': 'list'},
+        'C: What are your Criteria for Success to achieve this goal?': {'answer_format': 'list'},
     }
     column_names = [
         'Goal',
@@ -371,7 +371,7 @@ def ten_ideas(topic='improve your life', frequency=None):
 
 def type_of_person(pronoun='person'):
     question = f'What type of {pronoun} do you choose to be today?'
-    type_of_person = answer_question(question, 'list', input_suffix=f'I choose to be the type of {pronoun} who ')
+    type_of_person = answer_question(question, 'list', input_suffix=f'I choose to be ')
     export_to_csv('Type of Person', type_of_person, question)
     return type_of_person
 
