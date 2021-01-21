@@ -17,6 +17,7 @@ def morning_reflection():
     print('Good morning handsome ;) \n')
     reflect()
     physiology()
+    daily_competency()
     type_of_person()
     intentions()
     gratitude()
@@ -384,3 +385,10 @@ def wins(frequency=None):
     print(f'Total Wins: {len(wins)}\n')
     export_to_csv('Wins', wins, 'Wins')
     return wins
+
+def daily_competency():
+    question = 'What 5 things do you feel the most competent at today?'
+    answer = answer_question(question, answer_format='list', ordered=True, cap='auto')
+    export_to_csv('Daily Competencies', answer, 'Daily Competencies')
+    return answer
+    
