@@ -9,12 +9,12 @@ def answer_questions_dict(questions_dict):
     return answer_list
 
 
-def answer_questions(question_list, answer_type, show_question_index=False, **kwargs):
+def answer_questions(question_list, answer_format, show_question_index=False, **kwargs):
     all_answer_list = []
     for question in question_list:
         if show_question_index:
             question += create_question_index_suffix(question, question_list)
-        question_answer = answer_question(question, answer_type, **kwargs)
+        question_answer = answer_question(question, answer_format, **kwargs)
         all_answer_list.append(question_answer)
     return all_answer_list
 
@@ -24,21 +24,21 @@ def create_question_index_suffix(question, question_list):
     return question_index_suffix
 
 
-def answer_question(question, answer_type, **kwargs):
-    if answer_type == 'inline':
+def answer_question(question, answer_format, **kwargs):
+    if answer_format == 'inline':
         answer = answer_question_as_inline(question, **kwargs)
-    elif answer_type == 'text':
+    elif answer_format == 'text':
         answer = answer_question_as_text(question)
-    elif answer_type == 'list':
+    elif answer_format == 'list':
         answer = answer_question_as_list(question, '• ', **kwargs)
     else:
         raise ValueError("Answer type must be inline, text, or list.")
-    determine_linebreak(answer_type)
+    determine_linebreak(answer_format)
     return answer
 
 
-def determine_linebreak(answer_type):
-    if answer_type in {'text', 'list'}:
+def determine_linebreak(answer_format):
+    if answer_format in {'text', 'list'}:
         print()
 
 
@@ -134,7 +134,7 @@ def create_choice_error_help_text(choice_list):
 
 def answer_question_as_text(question):
     print(question)
-    help_text = '(linebreaks are enabled. To end reflection, press "." on a new line and press enter)'
+    help_text = '(linebreaks are enabled. To end reflection, press "." on a new line and press enter)\n'
     print(help_text)
     answer = answer_as_text()
     return answer

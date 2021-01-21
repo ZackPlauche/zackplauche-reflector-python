@@ -10,6 +10,5 @@ activity_dict = {
     'Prismatic System': activities.prismatic_system,
     'Physiology Check': activities.physiology,
     'Wins': activities.wins,
-    'Self Actualization': activities.self_actualization
 }
 run_reflector(activity_dict)
