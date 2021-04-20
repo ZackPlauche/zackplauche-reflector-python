@@ -389,6 +389,10 @@ def wins(frequency=None):
 def daily_competency():
     question = 'What 5 things do you feel the most competent at today?'
     answer = answer_question(question, answer_format='list', ordered=True, cap='auto')
-    export_to_csv('Daily Competencies', answer, 'Daily Competencies')
+    file_name = 'Daily Competenices'
+    export_to_csv(file_name, answer, file_name)
     return answer
     
+def choose_to_create():
+    question = 'What do you choose to create today?'
+    answer_question(question, 'list', ordered=True, input_suffix='I choose to create ')
