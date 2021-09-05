@@ -1,14 +1,8 @@
-from reflector import run_reflector
-from config import activities
+from reflector import Reflector
+from activities import morning_reflection, gratitude_list
 
-activity_dict = {
-    'Morning Reflection': activities.morning_reflection,
-    'End of Day Reflection': activities.end_of_day_reflection,
-    'Weekly Reflection': activities.weekly_reflection,
-    'Monthly Reflection': activities.monthly_reflection,
-    'Acclaim System': activities.acclaim_system,
-    'Prismatic System': activities.prismatic_system,
-    'Physiology Check': activities.physiology,
-    'Wins': activities.wins,
-}
-run_reflector(activity_dict)
+
+Reflector([
+    morning_reflection,
+    gratitude_list,
+]).run()

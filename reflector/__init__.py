@@ -1,1 +1,1 @@
-from .reflector import run_reflector
+from .reflector import Reflector
