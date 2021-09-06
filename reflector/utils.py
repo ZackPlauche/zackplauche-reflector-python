@@ -2,7 +2,7 @@ def listify(list_, ordered=False) -> str:
     """ Turn a list into a string representaton of the list. Either numbered
     or bulleted.  """
     if ordered:
-        return '\n'.join([f'{i} {answer}' for i, answer in enumerate(list_, 1)])
+        return '\n'.join([f'{i}. {answer}' for i, answer in enumerate(list_, 1)])
     return '\n'.join([f'• {answer}' for answer in list_])
 
 

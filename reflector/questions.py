@@ -1,7 +1,14 @@
 import copy
+from reflector.utils import listify
 
 YES_ANSWERS = ['y', 'yes', 'yep', 'yessir', 'yeezer', 'yerp']
-NO_ANSWERS = ['n', 'no', 'nope', 'nada']
+NO_ANSWERS = ['n', 'no', 'nope', 'nada', '']
+
+def ask_question(question) -> list:
+    answer = question.ask()
+    if isinstance(answer, list):
+        answer = listify(answer, ordered=isinstance(question, OrderedListQuestion))
+    return answer
 
 
 class Question:
@@ -39,6 +46,11 @@ class Question:
 
 class TextQuestion(Question):
     help_text = '\n(linebreaks are enabled. To finish answering, press "." on a new line and press enter)'
+    
+    def __init__(self, question, name=''):
+        self.question = str(question)
+        self.name = str(name) if name else self.question
+        self.ending = '\n'
 
     def ask_question(self):
         print(self.question, self.help_text, end="\n\n")
@@ -58,8 +70,7 @@ class InlineQuestion(Question):
             valid_answers = []
         elif isinstance(valid_answers, range):
             valid_answers = map(str, list(valid_answers))
-        self.question = str(question)
-        self.name = name if name else self.question
+        super().__init__(question, name)
         self.valid_answers = list(valid_answers)
         self.display_answers = display_answers if not display_answers == 'default' else self.valid_answers
         self.ending = ''
@@ -80,20 +91,13 @@ class YesNoQuestion(InlineQuestion):
     valid_answers = YES_ANSWERS + NO_ANSWERS
     display_answers = ['y', 'n']
 
-    def __init__(self, question, name=''):
-        self.question = str(question)
-        self.name = str(name) if name else self.question
+    __init__ = Question.__init__
 
 
 class ListQuestion(Question):
 
-    def __init__(self,
-                 question: str,
-                 list_style: str = '• ',
-                 name: str = ''
-                 ):
-        self.question = str(question)
-        self.name = str(name) if name else self.question
+    def __init__(self, question, list_style='• ', name=''):
+        super().__init__(question, name)
         self.list_style = str(list_style)
         self.ending = '\n'
 
@@ -109,19 +113,22 @@ class ListQuestion(Question):
         return self.answer_list
 
 
+
 class OrderedListQuestion(ListQuestion):
 
-    def __init__(self,
-                 question,
-                 limit: int = 0,
-                 list_style: str = '',
-                 name: str = '',
-                 ):
-        self.question = str(question)
+    def __init__(self, question, list_style='. ', name='', limit=0, loop=False):
+        super().__init__(question, list_style, name)
+        if loop and not limit > 0:
+            raise ValueError('OrderedListQuestion \'loop\' arg can only be used when \'limit\' is greater than 0.')
         self.limit = int(limit)
-        self.list_style = str(list_style)
-        self.name = str(name) if name else self.question
-        self.ending = '\n'
+        self.loop = bool(loop)
+
+    def ask_question(self):
+        self.answer_list = []
+        if not self.loop:
+            print(self.question)
+        answer = self._get_list_answer()
+        return answer
 
     def _get_list_answer(self):
         count = 1
@@ -135,8 +142,11 @@ class OrderedListQuestion(ListQuestion):
         return self.answer_list
 
     def _build_prompt(self, count):
-        if self.limit and self.list_style:
-            return f'{self.list_style} ({count} of {self.limit}): '
-        elif self.limit:
-            return f'{count} of {self.limit}. '
-        return f'{count}. '
+        if self.limit and self.loop:
+            return f'{self.question} ({count} of {self.limit}): '
+        else:
+            prompt = f'{count}'
+            if self.limit:
+                prompt += f' of {self.limit}'
+            prompt += self.list_style
+            return prompt

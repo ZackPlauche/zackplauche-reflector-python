@@ -1,6 +1,6 @@
 import time
 
-from reflector.activities import Activity, IntegrityActivity, SuperActivity
+from reflector.activities import Activity
 from reflector.questions import InlineQuestion, YesNoQuestion, YES_ANSWERS
 from reflector.utils import create_total_time_string
 
@@ -8,12 +8,12 @@ from reflector.utils import create_total_time_string
 class Reflector:
 
     def __init__(self, activities: list):
-        if not all(isinstance(activity, (Activity, IntegrityActivity, SuperActivity)) for activity in activities):
+        if not all(isinstance(activity, Activity) for activity in activities):
             raise TypeError('All objects in "activities" list must be a type of Activity.')
         self.activities = activities
 
     def run(self):
-        print('Welcome to Reflector!')
+        print('\nWelcome to Reflector!')
         while True:
             activity = self.select_activity()
             start_time = time.time()

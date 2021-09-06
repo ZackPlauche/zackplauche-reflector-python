@@ -2,19 +2,18 @@ from datetime import datetime
 
 import pandas as pd
 
-from reflector.questions import YesNoQuestion, YES_ANSWERS
-from reflector.utils import listify
+from reflector.questions import ask_question, Question, YesNoQuestion, YES_ANSWERS 
 from reflector.settings import STORAGE_DIRECTORY
 
 
 class Activity:
 
-    def __init__(self, name, questions, intro_text=''):
+    def __init__(self, name, items, intro_text=''):
         self.name = name
-        if not questions:
-            raise ValueError('Argument "questions" list cannot be empty.')
-        self.questions = list(questions)
-        self.columns = [question.name for question in self.questions]
+        self.items = items
+        self.questions = [item for item in items if isinstance(item, Question)]
+        self.activities = [item for item in items if isinstance(item, Activity)]
+        self.columns = self._get_columns()
         self.intro_text = intro_text
 
     def __str__(self):
@@ -24,52 +23,73 @@ class Activity:
         return f'<{self.__class__.__name__}: {self.__str__()}>'
 
     def run(self) -> list:
+        self.answers = []
         self._print_intro_text()
-        self._ask_questions()
-        self._export()
+        self._get_answers()
+        self.export()
         return self.answers
+    
+    def _get_answers(self):
+        for item in self.items:
+            if isinstance(item, Question):
+                self.answers.append(ask_question(item))
+            else:
+                self.answers += item.run()
+
+    def _get_columns(self):
+        columns = []
+        for item in self.items:
+            if isinstance(item, Question):
+                question = item
+                columns.append(question.name)
+            else:
+                activity = item
+                columns += activity.columns
+        return columns
 
     def _print_intro_text(self):
         if self.intro_text:
             print(self.intro_text, end='\n\n')
 
-    def _ask_questions(self) -> list:
-        self.answers = []
-        for question in self.questions:
-            answer = question.ask()
-            if isinstance(answer, list):
-                answer = listify(answer)
-            self.answers.append(answer)
-        return self.answers
-
-    def _export(self):
+    def export(self):
         if not self.answers:
             raise AttributeError('Cannot export Activity without answer data.')
         file_path = STORAGE_DIRECTORY / f'{self.name}.csv'
-        df = pd.DataFrame(data=[[str(datetime.now())] + self.answers], columns=['DateTime'] + self.columns)
+        data, columns = self.build_data()
+        df = pd.DataFrame(data=data, columns=columns)
         if file_path.exists():
             previous_df = pd.read_csv(file_path)
             df = previous_df.append(df)
         df.to_csv(file_path, index=False)
+        
+    def build_data(self):
+        """
+        Data building method to add any additional data before exporting.
+        Used in self._export()
+        """
+        data = [[str(datetime.now().strftime('%Y-%m-%d %T'))] + self.answers]
+        columns = ['DateTime'] + self.columns
+        return data, columns
 
 
 class IntegrityActivity(Activity):
 
-    def __init__(self, name, yes_no_questions, category, intro_text: str = ''):
+    def __init__(self, name, yes_no_questions, intro_text=''):
         if not all(isinstance(question, YesNoQuestion) for question in yes_no_questions):
             raise ValueError('questions in IntegrityActivity must be type "YesNoQuestion".')
-        self.name = name
-        self.questions = yes_no_questions
-        self.intro_text = intro_text
-        self.category = f'{category} '
+        super().__init__(name, yes_no_questions, intro_text)
 
-    def run(self):
+    def run(self) -> list:
+        self.answers = []
         self._print_intro_text()
-        self._ask_questions()
+        self._get_answers()
         self._get_integrity()
-        print('\n', f'Your {self.category}integrity is at {self.integrity}%!')
-        self._export()
+        self._print_integrity()
+        self.export()
         return self.answers
+    
+    def _print_integrity(self):
+        print(f'\nYour {self.name.lower()} integrity is at {self.integrity}%!', end='\n\n')
 
     def _get_integrity(self):
         integrity_piece = 100 / len(self.questions)
@@ -77,41 +97,10 @@ class IntegrityActivity(Activity):
         for answer in self.answers:
             if answer.casefold() in YES_ANSWERS:
                 integrity += integrity_piece
-        self.integrity = round(integrity, 1)
+        self.integrity = round(integrity)
         return self.integrity
 
-    def _export(self):
-        if not self.answers:
-            raise AttributeError('Cannot export Activity without answer data.')
-        file_path = STORAGE_DIRECTORY / f'{self.name}.csv'
-        columns = ['DateTime', 'Integrity'] + self.columns
+    def build_data(self):
         data = [[str(datetime.now()), self.integrity] + self.answers]
-        df = pd.DataFrame(data=data, columns=columns)
-        if file_path.exists():
-            previous_df = pd.read_csv(file_path)
-            df = previous_df.append(df)
-        df.to_csv(file_path, index=False)
-
-
-class SuperActivity(Activity):
-
-    def __init__(self, name: str, activities: list, intro_text: str = ''):
-        self.name = str(name)
-        if not activities:
-            raise ValueError('Argument "activities" list cannot be empty.')
-        self.activities = list(activities)
-        self.columns = [column for activity in self.activities for column in activity.columns]
-        self.intro_text = str(intro_text)
-
-    def run(self) -> list:
-        self._print_intro_text()
-        self._run_activities()
-        self._export()
-        return self.answers
-
-    def _run_activities(self) -> list:
-        self.answers = []
-        for activity in self.activities:
-            activity_answers = activity.run()
-            self.answers += activity_answers
-        return self.answers
+        columns = ['DateTime', f'{self.name} Score'] + self.columns
+        return data, columns
