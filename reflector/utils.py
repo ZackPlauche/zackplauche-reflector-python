@@ -1,28 +1,32 @@
-from reflector.answer import validate_choice
+def listify(list_, ordered=False) -> str:
+    """ Turn a list into a string representaton of the list. Either numbered
+    or bulleted.  """
+    if ordered:
+        return '\n'.join([f'{i}. {answer}' for i, answer in enumerate(list_, 1)])
+    return '\n'.join([f'• {answer}' for answer in list_])
 
 
-def get_and_print_integrity_status(yesno_questions: list, yesno_answers: list, topic: str):
-    integrity_status = get_integrity_status(yesno_questions, yesno_answers)
-    print(f'\nYour {topic} is at {integrity_status}.\n')
-    return integrity_status
+def is_int(string):
+    try:
+        int(string)
+        return True
+    except ValueError:
+        return False
 
 
-def get_integrity_status(yesno_questions: list, yesno_answers: list):
-    integrity_slice = 100 / len(yesno_questions)
-    integrity: int = sum([integrity_slice for answer in yesno_answers if answer in {'y', 'yes'}]).__int__()
-    integrity_status = f'{integrity}%'
-    return integrity_status
+def create_total_time_string(seconds):
+    hours, minutes = convert_seconds_to_hours_minutes(seconds)
+    minute_suffix = 'minutes' if minutes != 1 else 'minute'
+    hour_suffix = 'hours' if hours != 1 else 'hour'
+    total_time = f'{minutes} {minute_suffix}'
+    if hours:
+        total_time = f'{hours} {hour_suffix} ' + total_time
+    return total_time
 
 
-def add_frequency_to_question(question: str, frequency: str) -> str:
-    frequency_dict = {
-        'daily': 'the day',
-        'weekly': 'the week',
-        'monthly': 'the month',
-        'yearly': 'the year',
-        'tomrrow': 'tomrrow',
-    }
-    validate_choice(frequency, list(frequency_dict.keys()))
-    frequency = frequency_dict.get(frequency)
-    updated_question = f'{question[:-1]} for {frequency}?'
-    return updated_question
+def convert_seconds_to_hours_minutes(seconds):
+    minutes, seconds = divmod(seconds, 60)
+    hours, minutes = divmod(minutes, 60)
+    hours = int(hours)
+    minutes = int(minutes)
+    return hours, minutes
