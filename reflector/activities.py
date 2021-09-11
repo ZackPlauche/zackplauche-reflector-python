@@ -1,3 +1,4 @@
+import copy
 from datetime import datetime
 
 import pandas as pd
@@ -26,9 +27,35 @@ class Activity:
         self.answers = []
         self._print_intro_text()
         self._get_answers()
-        self.export()
+        self._export()
         return self.answers
     
+    def add_intro(self, intro_text):
+        """Creates a copy of an activity with added intro text. Used
+        when adding a predefined activity to another activity to not edit all other
+        instances of the activity.
+        
+        Example:
+
+        Do this to change the intro text of an activity:
+        >>> predefined_activity = Activity(...)
+        >>> other_activity = Activity('Other Activity', [
+        ...    predefined_activity.add_intro('Custom Activity Text')
+        ... ])
+        
+        DO NOT do this:
+        >>> predefined_activity.intro_text = 'Something else
+        >>> other_activity = Activity('Other Activity', [
+        >>>     predefined_activity
+        >>> ])
+
+        Otherwise you'll add the intro text to everywhere that activity is used.
+        """
+
+        activity_copy = copy.copy(self)
+        activity_copy.intro_text = intro_text
+        return activity_copy
+
     def _get_answers(self):
         for item in self.items:
             if isinstance(item, Question):
@@ -51,18 +78,18 @@ class Activity:
         if self.intro_text:
             print(self.intro_text, end='\n\n')
 
-    def export(self):
+    def _export(self):
         if not self.answers:
             raise AttributeError('Cannot export Activity without answer data.')
         file_path = STORAGE_DIRECTORY / f'{self.name}.csv'
-        data, columns = self.build_data()
+        data, columns = self._build_data()
         df = pd.DataFrame(data=data, columns=columns)
         if file_path.exists():
             previous_df = pd.read_csv(file_path)
             df = previous_df.append(df)
         df.to_csv(file_path, index=False)
         
-    def build_data(self):
+    def _build_data(self):
         """
         Data building method to add any additional data before exporting.
         Used in self._export()
@@ -85,7 +112,7 @@ class IntegrityActivity(Activity):
         self._get_answers()
         self._get_integrity()
         self._print_integrity()
-        self.export()
+        self._export()
         return self.answers
     
     def _print_integrity(self):
@@ -100,7 +127,7 @@ class IntegrityActivity(Activity):
         self.integrity = round(integrity)
         return self.integrity
 
-    def build_data(self):
+    def _build_data(self):
         data = [[str(datetime.now()), self.integrity] + self.answers]
         columns = ['DateTime', f'{self.name} Score'] + self.columns
         return data, columns

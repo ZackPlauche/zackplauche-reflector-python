@@ -22,7 +22,6 @@ work_priorities = OrderedListQuestion('What are your top 3 professional prioriti
 ten_ideas_to_improve_your_life = OrderedListQuestion('What are 10 ideas to improve your life?', limit=10, loop=True, name='10 Ideas to Improve Your Life')
 
 
-
 # Activities
 
 physiology = IntegrityActivity('Physiology', [
@@ -60,11 +59,11 @@ self_actualization = Activity('Self Actualization', [
 ])
 
 acclaim_system = Activity('Acclaim System', [
-    physiology,
-    security,
-    love_and_belonging,
-    self_esteem,
-    self_actualization,
+    physiology.add_intro('PHYSIOLOGY'),
+    security.add_intro('SECURITY'),
+    love_and_belonging.add_intro('LOVE AND BELONGING'),
+    self_esteem.add_intro('SELF ESTEEM'),
+    self_actualization.add_intro('SELF ACTUALIZATION'),
 ])
 
 prismatic_system = Activity('Prismatic System', [
@@ -124,25 +123,25 @@ end_of_day_reflection = Activity('End of Day Reflection', [
 ], intro_text='Good evening sir! :)')
 
 weekly_reflection = Activity('Weekly Reflection', [
-    reflect,
+    reflect.rename('Reflection 1'),
     weekly_wins,
     improvements,
     OrderedListQuestion('What are your top 3 personal priorities for the week (starting with THE ONE THING)?', limit=3, name='Tomorrow Personal Priorities'),
     OrderedListQuestion('What are your top 3 professional priorities for the week (starting with THE ONE THING)?', limit=3, name='Tomorrow Professional Priorities'),
     OrderedListQuestion('What are 10 ideas to crush it this week?', limit=10, name='10 Ideas to Crush It This Week'),
     ListQuestion('What does your perfect day look like this week?', name='Weekly Perfect Day'),
-    reflect,
+    reflect.rename('Reflection 2'),
 ], intro_text='I hope you had a nice week sir! :)')
 
 
 monthly_reflection = Activity('Monthly Reflection', [
-        reflect,
-        ListQuestion('What were your wins for the month?', name='Monthly Wins'),
-        improvements,
-        ListQuestion('What are your top 3 priorities for the month (starting with THE ONE THING)?', name='Monthly Priorities'),
-        OrderedListQuestion('What are 10 ideas to crush it this month?'),
-        OrderedListQuestion('What does your perfect day look like this month?', name='Perfect Day')
-    ], intro_text='Wow, a whole month. I hope you hada nice month sir! :)\n')
+    reflect,
+    ListQuestion('What were your wins for the month?', name='Monthly Wins'),
+    improvements,
+    ListQuestion('What are your top 3 priorities for the month (starting with THE ONE THING)?', name='Monthly Priorities'),
+    OrderedListQuestion('What are 10 ideas to crush it this month?'),
+    OrderedListQuestion('What does your perfect day look like this month?', name='Perfect Day')
+], intro_text='Wow, a whole month. I hope you hada nice month sir! :)\n')
 
 
 birthday_reflection = Activity('It\'s My Birthday', [
@@ -150,5 +149,5 @@ birthday_reflection = Activity('It\'s My Birthday', [
     improvements,
     OrderedListQuestion('What are your priorities for the year (starting with THE ONE THING)?', name='Birthday Priorities'),
     OrderedListQuestion('What are 10 ideas to make this year your most amazing year so far?', name='10 Ideas for the Best Year So Far')
-    ], intro_text='Happy birthday sir! :)')
+], intro_text='Happy birthday sir! :)')
 
