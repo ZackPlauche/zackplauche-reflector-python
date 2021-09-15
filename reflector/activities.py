@@ -3,7 +3,7 @@ from datetime import datetime
 
 import pandas as pd
 
-from reflector.questions import ask_question, Question, YesNoQuestion, YES_ANSWERS 
+from reflector.questions import ask_question, Question, YesNoQuestion, YES_ANSWERS, NO_ANSWERS
 from reflector.settings import STORAGE_DIRECTORY
 
 
@@ -101,10 +101,14 @@ class Activity:
 
 class IntegrityActivity(Activity):
 
-    def __init__(self, name, yes_no_questions, intro_text=''):
+    def __init__(self, name, yes_no_questions, intro_text='', solutions: list = None):
         if not all(isinstance(question, YesNoQuestion) for question in yes_no_questions):
             raise ValueError('questions in IntegrityActivity must be type "YesNoQuestion".')
         super().__init__(name, yes_no_questions, intro_text)
+        if solutions:
+            self._validate_solutions(solutions)
+        self.solutions = solutions
+
 
     def run(self) -> list:
         self.answers = []
@@ -112,8 +116,27 @@ class IntegrityActivity(Activity):
         self._get_answers()
         self._get_integrity()
         self._print_integrity()
+        if self.solutions:
+            solutions = self._get_solutions()
+            self._print_solutions(solutions)
         self._export()
         return self.answers
+
+    def with_solutions(self, solutions: list):
+        self._validate_solutions(solutions)
+        new_integrity_activity = copy.copy(self)
+        new_integrity_activity.solutions = solutions
+        return new_integrity_activity
+
+    def without_solutions(self):
+        new_integrity_activity = copy.copy(self)
+        new_integrity_activity.solutions = None
+        return new_integrity_activity
+
+    def _build_data(self):
+        data = [[str(datetime.now()), self.integrity] + self.answers]
+        columns = ['DateTime', f'{self.name} Score'] + self.columns
+        return data, columns
     
     def _print_integrity(self):
         print(f'\nYour {self.name.lower()} integrity is at {self.integrity}%!', end='\n\n')
@@ -126,8 +149,19 @@ class IntegrityActivity(Activity):
                 integrity += integrity_piece
         self.integrity = round(integrity)
         return self.integrity
-
-    def _build_data(self):
-        data = [[str(datetime.now()), self.integrity] + self.answers]
-        columns = ['DateTime', f'{self.name} Score'] + self.columns
-        return data, columns
+    
+    def _get_solutions(self):
+        solutions = [solution for solution, answer in zip(self.solutions, self.answers) if answer in NO_ANSWERS]
+        return solutions
+    
+    def _print_solutions(self, solutions):
+        print(f'You can improve your {self.name.lower()} by:',
+               *(f'• {solution}' for solution in solutions),
+               sep='\n', end='\n\n')
+        
+    def _validate_solutions(self, solutions):
+        if not isinstance(solutions, (list, tuple)):
+            raise ValueError('solutions iterable must be either a list or tuple.')
+        if len(solutions) != len(self.questions):
+            raise ValueError('solutions list or tuple length must equal the number of yesno_questions in this activity.')
+        

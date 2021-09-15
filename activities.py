@@ -32,6 +32,14 @@ physiology = IntegrityActivity('Physiology', [
     YesNoQuestion('Is the temperature fine for you?', name='Good Temperature'),
     YesNoQuestion('Is your environment clean and organized?', name='Clean Environment'),
     YesNoQuestion('Do you feel complete wellness?', name='Feeling of Wellness'),
+], solutions=[
+        'Taking a nap up to 30 minutes',
+        'Drinking some water',
+        'Eating something healthy',
+        'Going for a 30 minute walk',
+        'Putting on more clothes, taking off some clothes, turning on a fan, Air Conditioner, heater, or drinking something warm, like tea :)',
+        'Cleaning  and/or organizing your environment',
+        'Drinking an herbal remedy, like ginger, lemon, and honey tea'
 ])
 
 security = IntegrityActivity('Security', [
@@ -59,7 +67,7 @@ self_actualization = Activity('Self Actualization', [
 ])
 
 acclaim_system = Activity('Acclaim System', [
-    physiology.add_intro('PHYSIOLOGY'),
+    physiology.add_intro('PHYSIOLOGY').without_solutions(),
     security.add_intro('SECURITY'),
     love_and_belonging.add_intro('LOVE AND BELONGING'),
     self_esteem.add_intro('SELF ESTEEM'),
@@ -109,7 +117,7 @@ morning_reflection = Activity('Morning Reflection', [
 ], intro_text='Good morning handsome ;)')
 
 end_of_day_reflection = Activity('End of Day Reflection', [
-    reflect,
+    reflect.rename('Reflection 1'),
     daily_wins,
     improvements,
     daily_lessons,
@@ -119,7 +127,7 @@ end_of_day_reflection = Activity('End of Day Reflection', [
     goals,
     OrderedListQuestion('What are your top 3 personal priorities for tomorrow (starting with THE ONE THING)?', limit=3, name='Tomorrow Personal Priorities'),
     OrderedListQuestion('What are your top 3 professional priorities for tomorrow (starting with THE ONE THING)?', limit=3, name='Tomorrow Professional Priorities'),
-    reflect,
+    reflect.rename('Reflection 2'),
 ], intro_text='Good evening sir! :)')
 
 weekly_reflection = Activity('Weekly Reflection', [
