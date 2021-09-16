@@ -16,7 +16,7 @@ class Question:
     def __init__(self, question, name=''):
         self.question = str(question)
         self.name = str(name) if name else self.question
-        self.ending = ''
+        self.ending = '\n'
 
     def __str__(self):
         return self.name
@@ -31,7 +31,7 @@ class Question:
         return answer
 
     def ask_question(self):
-        answer = input(self.question)
+        answer = input(f'{self.question}\n\n')
         return answer
 
     def rename(self, name):
@@ -91,7 +91,10 @@ class YesNoQuestion(InlineQuestion):
     valid_answers = YES_ANSWERS + NO_ANSWERS
     display_answers = ['y', 'n']
 
-    __init__ = Question.__init__
+    def __init__(self, question, name=''):
+        self.question = str(question)
+        self.name = str(name) if name else self.question
+        self.ending = ''
 
 
 class ListQuestion(Question):

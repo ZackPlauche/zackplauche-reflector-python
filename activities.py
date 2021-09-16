@@ -1,5 +1,5 @@
 from reflector.activities import Activity, IntegrityActivity
-from reflector.questions import ListQuestion, InlineQuestion, TextQuestion, YesNoQuestion, OrderedListQuestion
+from reflector.questions import ListQuestion, InlineQuestion, TextQuestion, YesNoQuestion, OrderedListQuestion, Question
 
 # Questions
 
@@ -14,7 +14,7 @@ meaningful_experience = TextQuestion('What was one meaningful experience you had
 perfect_day = OrderedListQuestion('Forget everything you just typed. Now,...\n\n' 'What does your perfect day look like?', name='Perfect Day')
 personal_priorities = OrderedListQuestion('What are your top 3 personal priorities (starting with The ONE Thing)?', limit=3, name='Personal Priorities'),
 reflect = TextQuestion('Take some time to reflect on your life.', name='Reflection')
-self_love = OrderedListQuestion('What are 10 reasons you love yourself?', limit=10, list_style='. I love myself becuase ', name='10 Reasons I Love Myself')
+self_love = OrderedListQuestion('What are 10 reasons you love yourself?', limit=10, list_style='. I love myself because ', name='10 Reasons I Love Myself')
 type_of_person = ListQuestion('What type of person do you choose to be today?', list_style='• I choose to be ', name='Type of Person')
 weekly_wins = ListQuestion('What are your wins for the week?', name='Weekly Wins')
 wins = ListQuestion('What are your wins?', name='Wins')
@@ -124,7 +124,7 @@ end_of_day_reflection = Activity('End of Day Reflection', [
     gratitude,
     meaningful_experience,
     self_love,
-    goals,
+    Question('If you were to give this day a name, what would it be?', name='Name This Day'),
     OrderedListQuestion('What are your top 3 personal priorities for tomorrow (starting with THE ONE THING)?', limit=3, name='Tomorrow Personal Priorities'),
     OrderedListQuestion('What are your top 3 professional priorities for tomorrow (starting with THE ONE THING)?', limit=3, name='Tomorrow Professional Priorities'),
     reflect.rename('Reflection 2'),
